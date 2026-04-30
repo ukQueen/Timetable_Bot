@@ -1,0 +1,855 @@
+\documentclass[10pt,a4paper,final]{article} %draft
+
+\usepackage[english, russian]{babel}
+
+\usepackage{geometry}
+%\usepackage[a4paper,left=2cm,right=2cm,top=2cm,bottom=2cm,bindingo ffset=0cm]{geometry}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[final]{pdfpages}
+
+\usepackage{textcomp,enumitem}
+
+\usepackage{amsmath,amsthm,amssymb}
+
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{adjustbox}
+
+
+
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{caption}
+
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{codegreen}{rgb}{0,0.5,0} % зеленый цвет
+\definecolor{codeblue}{rgb}{0,0,0.5} % синий цвет
+\definecolor{codestring}{rgb}{0.64,0.08,0.08} % цвет строк
+
+
+\lstset{
+	language=C++,
+	extendedchars=true,
+	literate=
+	{а}{{\selectfont\char224}}1
+	{б}{{\selectfont\char225}}1
+	{в}{{\selectfont\char226}}1
+	{г}{{\selectfont\char227}}1
+	{д}{{\selectfont\char228}}1
+	{е}{{\selectfont\char229}}1
+	{ж}{{\selectfont\char230}}1
+	{з}{{\selectfont\char231}}1
+	{и}{{\selectfont\char232}}1
+	{й}{{\selectfont\char233}}1
+	{к}{{\selectfont\char234}}1
+	{л}{{\selectfont\char235}}1
+	{м}{{\selectfont\char236}}1
+	{н}{{\selectfont\char237}}1
+	{о}{{\selectfont\char238}}1
+	{п}{{\selectfont\char239}}1
+	{р}{{\selectfont\char240}}1
+	{с}{{\selectfont\char241}}1
+	{т}{{\selectfont\char242}}1
+	{у}{{\selectfont\char243}}1
+	{ф}{{\selectfont\char244}}1
+	{х}{{\selectfont\char245}}1
+	{ц}{{\selectfont\char246}}1
+	{ч}{{\selectfont\char247}}1
+	{ш}{{\selectfont\char248}}1
+	{щ}{{\selectfont\char249}}1
+	{ъ}{{\selectfont\char250}}1
+	{ы}{{\selectfont\char251}}1
+	{ь}{{\selectfont\char252}}1
+	{э}{{\selectfont\char253}}1
+	{ю}{{\selectfont\char254}}1
+	{я}{{\selectfont\char255}}1
+	{А}{{\selectfont\char192}}1
+	{Б}{{\selectfont\char193}}1
+	{В}{{\selectfont\char194}}1
+	{Г}{{\selectfont\char195}}1
+	{Д}{{\selectfont\char196}}1
+	{Е}{{\selectfont\char197}}1
+	{Ж}{{\selectfont\char198}}1
+	{З}{{\selectfont\char199}}1
+	{И}{{\selectfont\char200}}1
+	{Й}{{\selectfont\char201}}1
+	{К}{{\selectfont\char202}}1
+	{Л}{{\selectfont\char203}}1
+	{М}{{\selectfont\char204}}1
+	{Н}{{\selectfont\char205}}1
+	{О}{{\selectfont\char206}}1
+	{П}{{\selectfont\char207}}1
+	{Р}{{\selectfont\char208}}1
+	{С}{{\selectfont\char209}}1
+	{Т}{{\selectfont\char210}}1
+	{У}{{\selectfont\char211}}1
+	{Ф}{{\selectfont\char212}}1
+	{Х}{{\selectfont\char213}}1
+	{Ц}{{\selectfont\char214}}1
+	{Ч}{{\selectfont\char215}}1
+	{Ш}{{\selectfont\char216}}1
+	{Щ}{{\selectfont\char217}}1
+	{Ъ}{{\selectfont\char218}}1
+	{Ы}{{\selectfont\char219}}1
+	{Ь}{{\selectfont\char220}}1
+	{Э}{{\selectfont\char221}}1
+	{Ю}{{\selectfont\char222}}1
+	{Я}{{\selectfont\char223}}1,
+	%	{|}{{\textbar}}1,
+	%	{||}{{\textbar\textbar}}1
+	%	{\&}{{\string&}}1
+	%	{==}{{\string==}}1
+	%	{\string\\}{{\string\\}}1,
+	numbers=left,
+	stepnumber=1,
+	firstnumber=1,
+	numberstyle=\tiny,
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=b,
+	keepspaces=true,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2,
+	frame=single,
+	keywordstyle=\color{codeblue}, % ключевые слова
+	commentstyle=\color{codegreen}, % комментарии
+	stringstyle=\color{codestring}, % строки
+	%identifierstyle=\color{green}, % стиль для переменных
+	backgroundcolor=\color{codegray},
+}
+%\usepackage{fancyvrb}
+
+%\usepackage{fancyhdr}
+
+%\usepackage{upgreek}
+
+%\usepackage{tipa}
+
+%\usepackage{tikz}
+
+%\usepackage{graphicx}
+
+%\usepackage{pgfplots}
+
+\usepackage{indentfirst}
+
+%\usepackage{gensymb}
+
+%\usepackage{amssymb}
+
+%\usepackage{pdfpages}
+
+\usepackage[unicode, pdftex, colorlinks, urlcolor=blue]{hyperref}
+
+%\usepackage[T2A]{fontenc}
+
+
+\usepackage{tabularx}
+\usepackage{multirow}
+
+\usepackage{booktabs} % для стильных линий таблицы
+
+
+
+\usepackage{graphics}
+
+\linespread{1.5}
+
+\pagestyle{plain}
+
+%\usepackage{listings}
+%\usepackage{moreverb}
+
+%\setlist[enumerate,itemize]{leftmargin=1.2cm} %отступ в перечислениях
+
+\hypersetup{
+	colorlinks=true,
+	linkcolor=black,
+	%allcolors=[RGB]{0 0 0}}
+	}
+	%\lstloadlanguages{ [LaTeX] TeX}
+
+	\lstloadlanguages{ [LaTeX] TeX}
+
+
+
+	\textheight=24cm
+	\textwidth=16cm
+	\oddsidemargin=0pt
+	\topmargin=-1.5cm
+	\parindent=24pt
+	\parskip=0pt
+	\tolerance=2000
+	\flushbottom
+
+	%\usepackage[font=scriptsize]{caption}
+	\usepackage[labelsep=period]{caption}
+
+	\begin{document}
+\thispagestyle{empty}
+
+\begin{center}
+	{\Large МИНОБРНАУКИ РОССИИ}\\
+	~\\
+	{\large ФЕДЕРАЛЬНОЕ ГОСУДАРСТВЕННОЕ БЮДЖЕТНОЕ ОБРАЗОВАТЕЛЬНОЕ УЧРЕЖДЕНИЕ ВЫСШЕГО ПРОФЕССИОНАЛЬНОГО ОБРАЗОВАНИЯ}\\
+	~\\
+	{\Large \bf <<САНКТ-ПЕТЕРБУРГСКИЙ ПОЛИТЕХНИЧЕСКИЙ УНИВЕРСИТЕТ ПЕТРА ВЕЛИКОГО>>}\\
+	~\\
+	{\large Институт компьютерных наук и кибербезопасности}\\
+	{\large Высшая школа технологий искусственного интеллекта}\\
+	{\large Направление 02.03.01 Математика и компьютерные науки}\\
+	~\\
+	~\\
+	~\\
+	~\\
+	{\Large \bf Отчет по лабораторной работе №1}\\
+		{\Large \bf <<Создание лексического анализатора>>}\\
+	{\Large по дисциплине <<Математическая логика и теория формальных языков>> }\\
+	~\\
+	~\\
+
+	{\Large Вариант №44}\\
+	%	{\Large \bf }\\
+
+	~\\
+	~\\
+	~\\
+	~\\
+	~\\
+	~\\
+	~\\
+	{\large Обучающийся: \underline{\hspace{3.5cm}} \qquad\qquad Гладков И.А.}\\
+	~\\
+	{\large Руководитель: \underline{\hspace{3.5cm}} \hspace{20mm} Востров А.В.}\\
+	~\\
+	~\\
+\end{center}
+\begin{flushright}
+
+	«\underline{\hspace{1cm}}»\underline{\hspace{3cm}}20\underline{\hspace{0.7cm}}г.
+\end{flushright}
+~\\
+\begin{center}
+	{\large Санкт-Петербург, 2026}
+\end{center}
+\newpage
+
+\tableofcontents
+
+\newpage
+\section* {Введение}
+\addcontentsline{toc}{section}{Введение}
+
+
+\section{Компонентная диаграмма}
+
+На компонентной диаграмме представлена архитектура Telegram-бота
+Lessons and Exams Timetable Bot. Система построена как серверное
+приложение на Java и Spring WebFlux. Внутри сервера выделены следующие
+логические слои: входной API layer, бизнес-модули, репозитории и адаптеры
+для взаимодействия с внешними системами.
+
+Основной пользовательский сценарий начинается с отправки команды или
+файла через Telegram. Запрос поступает в слой API, затем передаётся в
+\texttt{MessageHandlerModule}, который определяет тип команды и направляет
+её в соответствующий бизнес-модуль. Бизнес-модули работают с данными
+через репозитории и внешние API-адаптеры. Данные пользователей,
+расписаний, задач, напоминаний и учебных сессий сохраняются в MongoDB.
+Для асинхронной обработки напоминаний используется RabbitMQ.
+
+\subsection{Сервер}
+
+\textbf{Роль:} центральный компонент системы.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item принимает пользовательские команды, сообщения и файлы через Telegram;
+    \item принимает HTTP-запросы администратора;
+    \item обрабатывает служебный endpoint \texttt{/healthcheck};
+    \item координирует взаимодействие между API layer, бизнес-модулями,
+    репозиториями и внешними API;
+    \item обеспечивает работу с MongoDB, RabbitMQ, LLM API, календарными API
+    и внешним API расписания учебного заведения.
+\end{itemize}
+
+\subsection{Пользователь (User)}
+
+\textbf{Роль:} основной конечный пользователь Telegram-бота.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item взаимодействует с системой через Telegram;
+    \item отправляет команды для просмотра расписания, управления задачами,
+    настройки напоминаний и получения LLM-рекомендаций;
+    \item может загружать файл расписания в формате CSV или iCal;
+    \item идентифицируется автоматически по Telegram \texttt{chatId} или
+    \texttt{telegramId};
+    \item может выполнить проверку состояния системы через endpoint
+    \texttt{/healthcheck}, если такой endpoint доступен публично.
+\end{itemize}
+
+\subsection{Администратор (Admin)}
+
+\textbf{Роль:} пользователь с расширенными правами.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item взаимодействует с системой через HTTP API;
+    \item получает API-ключ или Bearer-токен через endpoint \texttt{/auth};
+    \item обращается к административному endpoint \texttt{/users};
+    \item может получать список пользователей системы;
+    \item может выполнять проверку состояния сервера через endpoint
+    \texttt{/healthcheck}.
+\end{itemize}
+
+\subsection{API layer}
+
+\textbf{Роль:} входной слой приложения.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item принимает входящие запросы от пользователей и администратора;
+    \item преобразует внешние запросы в формат, удобный для бизнес-модулей;
+    \item передаёт команды, данные пользователя, файлы и HTTP-запросы в
+    соответствующие модули.
+\end{itemize}
+
+\subsubsection{API (Telegram message handlers)}
+
+\textbf{Роль:} обработка входящих Telegram-сообщений и команд.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item принимает команды пользователя, например \texttt{/start},
+    \texttt{/today}, \texttt{/week}, \texttt{/add\_task}, \texttt{/advisor};
+    \item принимает файлы расписания для импорта;
+    \item извлекает из сообщения \texttt{chatId}, \texttt{telegramId},
+    текст команды, callback data и fileId;
+    \item передаёт распознанную команду в \texttt{MessageHandlerModule};
+    \item отправляет пользователю ответы, уведомления и сообщения об ошибках.
+\end{itemize}
+
+\subsubsection{API (Healthcheck)}
+
+\textbf{Роль:} служебный endpoint для проверки состояния системы.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает запрос \texttt{GET /healthcheck};
+    \item не требует административной авторизации;
+    \item передаёт запрос в \texttt{HealthCheckModule};
+    \item возвращает состояние сервера, состояние подключения к MongoDB и
+    информацию об авторах проекта.
+\end{itemize}
+
+\subsubsection{API (Admin level)}
+
+\textbf{Роль:} входной HTTP API для административных функций.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает запрос \texttt{/auth} для получения токена администратора;
+    \item обрабатывает запрос \texttt{/users} для получения списка пользователей;
+    \item передаёт логин, пароль и Bearer-токен в \texttt{AdminAuthModule};
+    \item передаёт авторизованные запросы в \texttt{ListUsersModule}.
+\end{itemize}
+
+\subsection{Модули системы}
+
+\subsubsection{MessageHandlerModule}
+
+\textbf{Роль:} центральный маршрутизатор пользовательских команд.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item получает распознанную Telegram-команду из \texttt{API (Telegram message handlers)};
+    \item определяет тип команды и выбирает нужный бизнес-модуль;
+    \item направляет команды расписания в \texttt{TimetableModule};
+    \item направляет команды импорта в \texttt{TimetableImportModule};
+    \item направляет команды управления задачами в \texttt{TaskModule};
+    \item направляет команды напоминаний в \texttt{ReminderModule};
+    \item направляет запросы к LLM-советнику в \texttt{AdvisorModule};
+    \item направляет команды синхронизации календаря в \texttt{CalendarSyncModule};
+    \item направляет команды учёта учебного времени в \texttt{StudySessionModule};
+    \item получает результат выполнения операции и формирует ответ пользователю.
+\end{itemize}
+
+\subsubsection{UserModule}
+
+\textbf{Роль:} управление пользователями Telegram-бота.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает команду \texttt{/start};
+    \item идентифицирует пользователя по Telegram \texttt{chatId} или
+    \texttt{telegramId};
+    \item создаёт нового пользователя при первом обращении к боту;
+    \item хранит настройки пользователя: имя, username, часовой пояс,
+    настройки напоминаний;
+    \item обращается к \texttt{UserRepository} для чтения и сохранения
+    пользовательских данных.
+\end{itemize}
+
+\subsubsection{TimetableModule}
+
+\textbf{Роль:} управление расписанием занятий и экзаменов.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item выводит расписание на сегодня, завтра и текущую неделю;
+    \item добавляет занятия и экзамены вручную;
+    \item обновляет данные существующих занятий и экзаменов;
+    \item удаляет события расписания;
+    \item группирует события по дате и сортирует их по времени начала;
+    \item обращается к \texttt{TimetableEventRepository} для работы с событиями
+    расписания.
+\end{itemize}
+
+\subsubsection{TimetableImportModule}
+
+\textbf{Роль:} импорт расписания из файлов и внешних источников.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item принимает CSV- или iCal-файл, загруженный пользователем;
+    \item выполняет проверку формата файла;
+    \item разбирает строки расписания и преобразует их в события системы;
+    \item валидирует дату, время, тип события, предмет и обязательные поля;
+    \item может получать расписание из внешнего API учебного заведения через
+    \texttt{API (Institution Timetable)};
+    \item сохраняет корректные занятия и экзамены через
+    \texttt{TimetableEventRepository};
+    \item сохраняет результат импорта и ошибки через \texttt{ImportJobRepository}.
+\end{itemize}
+
+\subsubsection{TaskModule}
+
+\textbf{Роль:} управление учебными задачами пользователя.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item добавляет учебные задачи, дедлайны, упражнения, лабораторные и
+    курсовые работы;
+    \item связывает задачи с учебными предметами;
+    \item выводит задачи на сегодня, завтра и неделю;
+    \item выводит задачи по выбранному предмету;
+    \item изменяет статус задачи на выполненную;
+    \item обращается к \texttt{StudyTaskRepository} для сохранения и получения
+    задач.
+\end{itemize}
+
+\subsubsection{ReminderModule}
+
+\textbf{Роль:} управление напоминаниями.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item хранит и изменяет настройки напоминаний пользователя;
+    \item создаёт напоминания о занятиях, экзаменах и дедлайнах;
+    \item определяет время отправки уведомлений;
+    \item обращается к \texttt{ReminderRepository} для хранения настроек и
+    задач напоминаний;
+    \item публикует задачи на отправку уведомлений через
+    \texttt{API (RabbitMQ)}.
+\end{itemize}
+
+\subsubsection{NotificationModule}
+
+\textbf{Роль:} отправка уведомлений пользователю.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item получает задачи уведомлений из RabbitMQ через \texttt{API (RabbitMQ)};
+    \item формирует текст уведомления для пользователя;
+    \item отправляет напоминания о занятиях, экзаменах и дедлайнах через
+    \texttt{API (Telegram message handlers)};
+    \item обрабатывает ошибки отправки сообщений.
+\end{itemize}
+
+\subsubsection{AdvisorModule}
+
+\textbf{Роль:} LLM-советник по учебному планированию.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает команды \texttt{/priority}, \texttt{/exam\_plan} и
+    \texttt{/ask\_advisor};
+    \item собирает контекст пользователя: расписание, экзамены, задачи,
+    дедлайны и приоритеты;
+    \item обращается к \texttt{TimetableEventRepository} и
+    \texttt{StudyTaskRepository} для получения учебного контекста;
+    \item формирует prompt для внешней LLM;
+    \item отправляет запрос во внешний LLM API через \texttt{API (LLM)};
+    \item возвращает пользователю учебные приоритеты, план подготовки к
+    экзамену или ответ на свободный вопрос.
+\end{itemize}
+
+\subsubsection{CalendarSyncModule}
+
+\textbf{Роль:} синхронизация расписания и задач с внешним календарём.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает команды синхронизации календаря;
+    \item передаёт занятия, экзамены и дедлайны во внешний календарь;
+    \item работает с Google Calendar API или Yandex Calendar API через
+    \texttt{API (Calendar)};
+    \item сохраняет связь между локальными событиями и внешними событиями
+    календаря через \texttt{CalendarSyncRepository};
+    \item обрабатывает ошибки синхронизации.
+\end{itemize}
+
+\subsubsection{StudySessionModule}
+
+\textbf{Роль:} учёт учебного времени пользователя.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает команды \texttt{/study\_start}, \texttt{/study\_stop} и
+    \texttt{/study\_stats};
+    \item фиксирует начало и окончание учебной сессии;
+    \item связывает учебную сессию с предметом;
+    \item рассчитывает длительность учебной сессии;
+    \item предоставляет статистику по предметам и периодам;
+    \item обращается к \texttt{StudySessionRepository} для хранения истории
+    занятий.
+\end{itemize}
+
+\subsubsection{AdminAuthModule}
+
+\textbf{Роль:} аутентификация и авторизация администратора.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает запросы к endpoint \texttt{/auth};
+    \item проверяет логин и пароль администратора;
+    \item обращается к \texttt{AdminRepository} для получения данных
+    администратора;
+    \item генерирует API-ключ или Bearer-токен при успешной аутентификации;
+    \item проверяет токен при обращении к защищённым административным
+    endpoint-ам.
+\end{itemize}
+
+\subsubsection{ListUsersModule}
+
+\textbf{Роль:} получение списка пользователей для администратора.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает административный запрос \texttt{/users};
+    \item получает список пользователей через \texttt{UserRepository};
+    \item возвращает администратору Telegram ID, username и другую служебную
+    информацию о пользователях;
+    \item использует \texttt{AdminAuthModule} для проверки прав доступа.
+\end{itemize}
+
+\subsubsection{HealthCheckModule}
+
+\textbf{Роль:} проверка состояния системы.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обрабатывает запросы от \texttt{API (Healthcheck)};
+    \item проверяет состояние серверного приложения;
+    \item проверяет доступность MongoDB;
+    \item при необходимости проверяет доступность RabbitMQ;
+    \item возвращает статус системы и список авторов проекта.
+\end{itemize}
+
+\subsection{Репозитории}
+
+\textbf{Роль:} слой доступа к данным MongoDB.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item предоставляет бизнес-модулям операции чтения, записи, обновления и
+    удаления данных;
+    \item инкапсулирует работу с коллекциями MongoDB;
+    \item передаёт запросы к базе данных через \texttt{API (MongoDB)}.
+\end{itemize}
+
+\subsubsection{UserRepository}
+
+\textbf{Роль:} хранение данных пользователей.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item сохраняет Telegram ID, chatId, username и настройки пользователя;
+    \item предоставляет поиск пользователя по Telegram ID;
+    \item используется модулями \texttt{UserModule} и \texttt{ListUsersModule}.
+\end{itemize}
+
+\subsubsection{AdminRepository}
+
+\textbf{Роль:} хранение данных администраторов.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item хранит логин администратора и хеш пароля;
+    \item используется модулем \texttt{AdminAuthModule};
+    \item не хранит пароль администратора в открытом виде.
+\end{itemize}
+
+\subsubsection{TimetableEventRepository}
+
+\textbf{Роль:} хранение занятий и экзаменов.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item хранит события расписания пользователя;
+    \item различает типы событий: занятие и экзамен;
+    \item предоставляет поиск событий на день, неделю и по предмету;
+    \item используется модулями \texttt{TimetableModule},
+    \texttt{TimetableImportModule} и \texttt{AdvisorModule}.
+\end{itemize}
+
+\subsubsection{StudyTaskRepository}
+
+\textbf{Роль:} хранение учебных задач.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item хранит задачи, дедлайны, приоритеты и статусы выполнения;
+    \item предоставляет поиск задач по предмету и периоду;
+    \item используется модулями \texttt{TaskModule} и \texttt{AdvisorModule}.
+\end{itemize}
+
+\subsubsection{ReminderRepository}
+
+\textbf{Роль:} хранение настроек и задач напоминаний.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item хранит настройки времени напоминаний;
+    \item хранит информацию о запланированных уведомлениях;
+    \item используется модулем \texttt{ReminderModule}.
+\end{itemize}
+
+\subsubsection{StudySessionRepository}
+
+\textbf{Роль:} хранение учебных сессий.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item хранит начало, окончание и длительность учебной сессии;
+    \item связывает сессию с пользователем и предметом;
+    \item используется модулем \texttt{StudySessionModule}.
+\end{itemize}
+
+\subsubsection{CalendarSyncRepository}
+
+\textbf{Роль:} хранение информации о синхронизации с календарём.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item хранит связь между локальным событием и внешним событием календаря;
+    \item хранит статус последней синхронизации;
+    \item используется модулем \texttt{CalendarSyncModule}.
+\end{itemize}
+
+\subsubsection{ImportJobRepository}
+
+\textbf{Роль:} хранение истории импорта расписания.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item сохраняет статус импорта расписания;
+    \item хранит количество успешно добавленных и пропущенных записей;
+    \item хранит ошибки импорта;
+    \item используется модулем \texttt{TimetableImportModule}.
+\end{itemize}
+
+\subsection{External API adapters}
+
+\textbf{Роль:} адаптеры для взаимодействия с внешними системами.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item скрывают детали конкретных внешних API от бизнес-модулей;
+    \item выполняют сериализацию и десериализацию запросов;
+    \item обрабатывают ошибки внешних сервисов;
+    \item возвращают бизнес-модулям данные в едином формате.
+\end{itemize}
+
+\subsubsection{API (MongoDB)}
+
+\textbf{Роль:} адаптер доступа к MongoDB.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item обеспечивает подключение к MongoDB;
+    \item выполняет CRUD-операции с документами;
+    \item используется всеми репозиториями системы.
+\end{itemize}
+
+\subsubsection{API (RabbitMQ)}
+
+\textbf{Роль:} адаптер взаимодействия с RabbitMQ.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item публикует сообщения о запланированных уведомлениях;
+    \item читает сообщения из очередей;
+    \item передаёт задачи уведомлений в \texttt{NotificationModule};
+    \item обеспечивает асинхронную обработку напоминаний.
+\end{itemize}
+
+\subsubsection{API (LLM)}
+
+\textbf{Роль:} адаптер взаимодействия с внешним LLM API.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item принимает prompt от \texttt{AdvisorModule};
+    \item отправляет запрос во внешний LLM API;
+    \item получает ответ модели;
+    \item возвращает учебные рекомендации, план подготовки или ответ на
+    свободный вопрос пользователя.
+\end{itemize}
+
+\subsubsection{API (Calendar)}
+
+\textbf{Роль:} адаптер взаимодействия с внешними календарями.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item создаёт события во внешнем календаре;
+    \item обновляет и удаляет события при изменении локального расписания;
+    \item получает внешние идентификаторы календарных событий;
+    \item используется модулем \texttt{CalendarSyncModule}.
+\end{itemize}
+
+\subsubsection{API (Institution Timetable)}
+
+\textbf{Роль:} адаптер взаимодействия с API расписания учебного заведения.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item отправляет запросы во внешний API расписания;
+    \item получает список занятий и экзаменов;
+    \item передаёт полученные данные в \texttt{TimetableImportModule};
+    \item используется как один из источников импорта расписания.
+\end{itemize}
+
+\subsection{MongoDB}
+
+\textbf{Роль:} основная база данных системы.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item хранит пользователей;
+    \item хранит занятия и экзамены;
+    \item хранит учебные задачи и дедлайны;
+    \item хранит настройки напоминаний;
+    \item хранит учебные сессии;
+    \item хранит данные синхронизации с внешними календарями;
+    \item хранит историю импортов расписания;
+    \item хранит данные администраторов.
+\end{itemize}
+
+\subsection{RabbitMQ}
+
+\textbf{Роль:} брокер сообщений для асинхронной обработки задач.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item принимает сообщения о необходимости отправки напоминаний;
+    \item хранит задачи уведомлений до момента обработки;
+    \item передаёт сообщения в \texttt{NotificationModule};
+    \item повышает надёжность отправки уведомлений и отделяет логику
+    планирования от логики отправки.
+\end{itemize}
+
+\subsection{LLM API}
+
+\textbf{Роль:} внешний сервис генерации учебных рекомендаций.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item принимает prompt с учебным контекстом пользователя;
+    \item генерирует рекомендации по приоритетам;
+    \item генерирует план подготовки к экзамену;
+    \item отвечает на свободные вопросы пользователя о планировании учёбы.
+\end{itemize}
+
+\subsection{Google/Yandex Calendar API}
+
+\textbf{Роль:} внешний календарный сервис.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item принимает запросы на создание календарных событий;
+    \item обновляет события при изменении расписания или дедлайнов;
+    \item удаляет события при отключении синхронизации;
+    \item возвращает внешние идентификаторы созданных событий.
+\end{itemize}
+
+\subsection{Institution Timetable API}
+
+\textbf{Роль:} внешний источник расписания учебного заведения.
+
+\textbf{Функционал:}
+\begin{itemize}
+    \item предоставляет расписание занятий и экзаменов;
+    \item может использовать номер группы, направление или другой идентификатор
+    учебной группы;
+    \item возвращает данные, которые затем преобразуются в события локального
+    расписания пользователя.
+\end{itemize}
+
+\subsection{Потоки данных на диаграмме}
+
+Пользователь отправляет Telegram-команды, сообщения и файлы в
+\texttt{API (Telegram message handlers)}. Далее запрос передаётся в
+\texttt{MessageHandlerModule}, который маршрутизирует его в нужный модуль.
+
+При работе с расписанием \texttt{MessageHandlerModule} вызывает
+\texttt{TimetableModule}. Модуль получает или изменяет занятия и экзамены
+через \texttt{TimetableEventRepository}, который выполняет операции с MongoDB
+через \texttt{API (MongoDB)}.
+
+При импорте расписания \texttt{TimetableImportModule} получает файл CSV/iCal
+или данные из \texttt{Institution Timetable API}. После валидации данные
+сохраняются через \texttt{TimetableEventRepository}. Результаты импорта и
+ошибки сохраняются через \texttt{ImportJobRepository}.
+
+При работе с задачами \texttt{TaskModule} сохраняет и получает задачи через
+\texttt{StudyTaskRepository}. Задачи могут использоваться не только для вывода
+списков, но и как часть контекста для \texttt{AdvisorModule}.
+
+При настройке напоминаний \texttt{ReminderModule} сохраняет параметры через
+\texttt{ReminderRepository} и публикует задачу уведомления через
+\texttt{API (RabbitMQ)}. Затем \texttt{NotificationModule} получает задачу
+уведомления и отправляет сообщение пользователю через Telegram.
+
+При обращении к LLM-советнику \texttt{AdvisorModule} собирает расписание,
+экзамены, задачи и дедлайны пользователя, формирует prompt и отправляет его
+через \texttt{API (LLM)} во внешний \texttt{LLM API}. Ответ модели возвращается
+пользователю через Telegram.
+
+При синхронизации календаря \texttt{CalendarSyncModule} передаёт занятия,
+экзамены и дедлайны через \texttt{API (Calendar)} во внешний
+\texttt{Google/Yandex Calendar API}. Связь между локальными и внешними
+событиями сохраняется через \texttt{CalendarSyncRepository}.
+
+Администратор обращается к \texttt{API (Admin level)}. Для получения доступа
+используется endpoint \texttt{/auth}, а для получения списка пользователей --
+endpoint \texttt{/users}. Проверка данных администратора выполняется в
+\texttt{AdminAuthModule}, а список пользователей получается через
+\texttt{ListUsersModule} и \texttt{UserRepository}.
+
+Endpoint \texttt{/healthcheck} обрабатывается через \texttt{API (Healthcheck)}
+и \texttt{HealthCheckModule}. Он возвращает состояние сервера, состояние
+подключения к MongoDB и служебную информацию о проекте.
+
+\end{document}
