@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: timetable-bot
+  profiles:
+    default: dev
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+admin:
+  auth:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin123}
+    token: ${ADMIN_TOKEN:dev-admin-token}
