@@ -19,7 +19,8 @@
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{adjustbox}
-
+\usepackage{pdflscape}  % Лучше, чем lscape, для PDF
+\usepackage{fancyhdr}
 
 
 
@@ -212,14 +213,12 @@
 	~\\
 	~\\
 	~\\
-	{\Large \bf Отчет по лабораторной работе №1}\\
-		{\Large \bf <<Создание лексического анализатора>>}\\
-	{\Large по дисциплине <<Математическая логика и теория формальных языков>> }\\
+	{\Large \bf Lessons and Exams Timetable Bot}\\
+		{\Large \bf Архитектура}\\
+	{\Large Гладков И.А., Саржан А.А., Смирнов С.Р., Фролов К.А.}\\
 	~\\
 	~\\
 
-	{\Large Вариант №44}\\
-	%	{\Large \bf }\\
 
 	~\\
 	~\\
@@ -228,18 +227,22 @@
 	~\\
 	~\\
 	~\\
-	{\large Обучающийся: \underline{\hspace{3.5cm}} \qquad\qquad Гладков И.А.}\\
-	~\\
-	{\large Руководитель: \underline{\hspace{3.5cm}} \hspace{20mm} Востров А.В.}\\
-	~\\
-	~\\
-\end{center}
-\begin{flushright}
 
-	«\underline{\hspace{1cm}}»\underline{\hspace{3cm}}20\underline{\hspace{0.7cm}}г.
-\end{flushright}
-~\\
-\begin{center}
+	~\\
+	~\\
+	~\\
+
+	~\\
+	~\\
+	~\\
+
+	~\\
+	~\\
+	~\\
+
+
+
+
 	{\large Санкт-Петербург, 2026}
 \end{center}
 \newpage
@@ -247,9 +250,18 @@
 \tableofcontents
 
 \newpage
-\section* {Введение}
-\addcontentsline{toc}{section}{Введение}
 
+\begin{landscape}
+\begin{figure}[H]
+\thispagestyle{empty}
+    \centering
+    \includegraphics[scale=0.5]{arc.png}
+    \caption{Архитектура}
+    \vspace{30mm}4
+    \label{arc}
+\end{figure}
+\end{landscape}
+\newpage
 
 \section{Компонентная диаграмма}
 
@@ -265,7 +277,8 @@ Lessons and Exams Timetable Bot. Система построена как сер
 её в соответствующий бизнес-модуль. Бизнес-модули работают с данными
 через репозитории и внешние API-адаптеры. Данные пользователей,
 расписаний, задач, напоминаний и учебных сессий сохраняются в MongoDB.
-Для асинхронной обработки напоминаний используется RabbitMQ.
+Для асинхронной обработки напоминаний используется RabbitMQ. Диаграмма представлена на рисунке \ref{arc}.
+
 
 \subsection{Сервер}
 
@@ -851,5 +864,15 @@ endpoint \texttt{/users}. Проверка данных администрато
 Endpoint \texttt{/healthcheck} обрабатывается через \texttt{API (Healthcheck)}
 и \texttt{HealthCheckModule}. Он возвращает состояние сервера, состояние
 подключения к MongoDB и служебную информацию о проекте.
-
+\newpage
+\begin{landscape}
+\begin{figure}[H]
+\thispagestyle{empty}
+    \centering
+    \includegraphics[scale=0.5]{arc.png}
+    \caption{Архитектура}
+    \vspace{30mm}17
+    \label{arc}
+\end{figure}
+\end{landscape}
 \end{document}
