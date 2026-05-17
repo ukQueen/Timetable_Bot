@@ -1,6 +1,8 @@
 package com.timetablebot.application.task;
 
 import com.timetablebot.domain.user.*;
+import com.timetablebot.application.notification.NotificationTaskPayload;
+import com.timetablebot.infrastructure.notification.NotificationPublisher;
 import com.timetablebot.infrastructure.task.TaskDocument;
 import com.timetablebot.infrastructure.task.TaskRepository;
 import org.springframework.stereotype.Component;
@@ -12,9 +14,11 @@ import java.time.*;
 @Component
 public class TaskModule {
     private final TaskRepository taskRepository;
+    private final NotificationPublisher notificationPublisher;
 
-    public TaskModule(TaskRepository taskRepository) {
+    public TaskModule(TaskRepository taskRepository, NotificationPublisher notificationPublisher) {
         this.taskRepository = taskRepository;
+        this.notificationPublisher = notificationPublisher;
     }
 
     public Mono<TaskItem> createTask(String userId, String title, Instant deadline, TaskPriority priority, TaskType type) {
@@ -27,7 +31,15 @@ public class TaskModule {
         doc.setStatus(TaskStatus.OPEN);
         doc.setCreatedAt(Instant.now());
         doc.setUpdatedAt(Instant.now());
-        return taskRepository.save(doc).map(this::toDomain);
+        return taskRepository.save(doc)
+                .doOnNext(saved -> notificationPublisher.publishTask(new NotificationTaskPayload(
+                        saved.getUserId(),
+                        saved.getId(),
+                        saved.getTitle(),
+                        saved.getDeadline(),
+                        "Напоминание: задача \"" + saved.getTitle() + "\" до " + saved.getDeadline()
+                )))
+                .map(this::toDomain);
     }
 
     public Flux<TaskItem> tasksForToday(String userId, ZoneId zoneId) {
@@ -39,7 +51,6 @@ public class TaskModule {
         LocalDate now = LocalDate.now(zoneId);
         return tasksByRange(userId, now, now.plusDays(7), zoneId);
     }
-
 
 
     public Mono<TaskItem> updateTask(String userId, String taskId, String title, Instant deadline, TaskPriority priority, TaskType type) {

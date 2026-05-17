@@ -9,6 +9,7 @@ import com.timetablebot.infrastructure.schedule.ImportHistoryRepository;
 
 import com.timetablebot.infrastructure.schedule.ScheduleEventDocument;
 import com.timetablebot.infrastructure.schedule.ScheduleEventRepository;
+import com.timetablebot.infrastructure.notification.NotificationPublisher;
 
 import com.timetablebot.infrastructure.task.TaskDocument;
 import com.timetablebot.infrastructure.task.TaskRepository;
@@ -52,6 +53,8 @@ class TelegramWebhookControllerTest {
     private TaskRepository taskRepository;
     @MockBean
     private TelegramBotClient telegramBotClient;
+    @MockBean
+    private NotificationPublisher notificationPublisher;
 
     @BeforeEach
     void setUp() {
