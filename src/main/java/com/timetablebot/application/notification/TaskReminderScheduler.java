@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 
@@ -33,15 +34,21 @@ public class TaskReminderScheduler {
         Instant until = now.plusSeconds(Math.max(1, leadMinutes) * 60);
 
         taskRepository.findAllByStatusAndDeadlineBetweenOrderByDeadlineAsc(TaskStatus.OPEN, now, until)
-                .doOnNext(task -> notificationPublisher.publishTask(new NotificationTaskPayload(
-                        task.getUserId(),
-                        task.getId(),
-                        task.getTitle(),
-                        task.getDeadline(),
-                        "Напоминание: задача \"" + task.getTitle() + "\" скоро дедлайн в " + task.getDeadline()
-                )))
+                .filter(task -> task.getLastReminderSentAt() == null)
+                .flatMap(task -> {
+                    notificationPublisher.publishTask(new NotificationTaskPayload(
+                            task.getUserId(),
+                            task.getId(),
+                            task.getTitle(),
+                            task.getDeadline(),
+                            "Напоминание: задача \"" + task.getTitle() + "\" скоро дедлайн в " + task.getDeadline()
+                    ));
+                    task.setLastReminderSentAt(now);
+                    task.setUpdatedAt(now);
+                    return taskRepository.save(task);
+                })
                 .doOnError(ex -> log.warn("Failed to schedule task reminders", ex))
-                .onErrorResume(ex -> reactor.core.publisher.Flux.empty())
+                .onErrorResume(ex -> Flux.empty())
                 .subscribe();
     }
 }

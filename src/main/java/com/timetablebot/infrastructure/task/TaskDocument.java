@@ -20,6 +20,7 @@ public class TaskDocument {
     private TaskPriority priority;
     private TaskStatus status;
     private Instant deadline;
+    private Instant lastReminderSentAt;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -37,6 +38,8 @@ public class TaskDocument {
     public void setStatus(TaskStatus status) { this.status = status; }
     public Instant getDeadline() { return deadline; }
     public void setDeadline(Instant deadline) { this.deadline = deadline; }
+    public Instant getLastReminderSentAt() { return lastReminderSentAt; }
+    public void setLastReminderSentAt(Instant lastReminderSentAt) { this.lastReminderSentAt = lastReminderSentAt; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
