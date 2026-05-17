@@ -30,3 +30,5 @@ spring:
 
     notifications:
       queue: ${NOTIFICATIONS_QUEUE:notifications.queue}
+      task-reminder-lead-minutes: ${TASK_REMINDER_LEAD_MINUTES:30}
+      scheduler-fixed-delay-ms: ${NOTIFICATIONS_SCHEDULER_FIXED_DELAY_MS:60000}

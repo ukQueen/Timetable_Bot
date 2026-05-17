@@ -2,26 +2,28 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/timetable_bot_test
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+      rabbitmq:
+        host: localhost
+        port: 5672
+        username: guest
+        password: guest
 
-admin:
-  auth:
-    username: ${ADMIN_USERNAME:admin}
-    password: ${ADMIN_PASSWORD:admin123}
-    token: ${ADMIN_TOKEN:dev-admin-token}
+    admin:
+      auth:
+        username: ${ADMIN_USERNAME:admin}
+        password: ${ADMIN_PASSWORD:admin123}
+        token: ${ADMIN_TOKEN:dev-admin-token}
 
-telegram:
-  bot:
-    enabled: false
-    token: ""
-    webhook-secret: ""
-    webhook-url: ""
-    register-webhook-on-startup: false
+    telegram:
+      bot:
+        enabled: false
+        token: ""
+        webhook-secret: ""
+        webhook-url: ""
+        register-webhook-on-startup: false
 
 
-notifications:
-  queue: notifications.queue
+    notifications:
+      queue: notifications.queue
+      task-reminder-lead-minutes: 30
+      scheduler-fixed-delay-ms: 60000
