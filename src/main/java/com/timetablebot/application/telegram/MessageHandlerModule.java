@@ -6,6 +6,7 @@ import com.timetablebot.application.telegram.dto.TelegramUpdateRequest;
 import com.timetablebot.application.task.TaskModule;
 
 import com.timetablebot.domain.schedule.EventType;
+import com.timetablebot.domain.schedule.ImportHistoryItem;
 import com.timetablebot.domain.schedule.ScheduleEvent;
 import com.timetablebot.domain.user.*;
 
@@ -14,10 +15,12 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
 public class MessageHandlerModule {
+    private static final DateTimeFormatter IMPORT_HISTORY_TIME_FORMATTER = DateTimeFormatter.ISO_INSTANT;
     private static final String MENU_MESSAGE = """
 Доступные команды:
 /start
@@ -30,6 +33,7 @@ public class MessageHandlerModule {
 /delete_event id
 /import_timetable <CSV или iCal>
 /import_external <url_csv>
+/imports
 /add_task title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER
 /edit_task id | title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER
 /tasks_today
@@ -78,6 +82,7 @@ public class MessageHandlerModule {
             case "/delete_event" -> deleteEvent(userId, args);
             case "/import_timetable" -> importTimetable(userId, args);
             case "/import_external" -> importExternal(userId, args);
+            case "/imports" -> scheduleModule.importHistory(userId).collectList().map(this::formatImportHistory);
             case "/add_task" -> addTask(userId, args);
             case "/tasks_today" -> userModule.createIfAbsent(userId).flatMap(profile -> taskModule.tasksForToday(userId, ZoneId.of(profile.timezone())).collectList()).map(this::formatTasks);
             case "/tasks_week" -> userModule.createIfAbsent(userId).flatMap(profile -> taskModule.tasksForWeek(userId, ZoneId.of(profile.timezone())).collectList()).map(this::formatTasks);
@@ -202,6 +207,47 @@ public class MessageHandlerModule {
         return importResult
                 .map(count -> BotMessageResponse.ok("Импорт завершен. Загружено событий: " + count))
                 .onErrorResume(ex -> Mono.just(BotMessageResponse.error(ex.getMessage())));
+    }
+
+    private BotMessageResponse formatImportHistory(List<ImportHistoryItem> imports) {
+        if (imports.isEmpty()) {
+            return BotMessageResponse.ok("Импорты: история пуста.");
+        }
+        StringBuilder b = new StringBuilder("Последние импорты:\n");
+        for (ImportHistoryItem item : imports) {
+            b.append("• ")
+                    .append(formatImportCreatedAt(item.createdAt()))
+                    .append(" | ")
+                    .append(item.source())
+                    .append(" | ")
+                    .append(localizeImportStatus(item.status()))
+                    .append(" | imported=")
+                    .append(item.importedCount());
+            if (item.errorMessage() != null && !item.errorMessage().isBlank()) {
+                b.append(" | error=").append(truncate(item.errorMessage(), 160));
+            }
+            b.append("\n");
+        }
+        return BotMessageResponse.ok(b.toString().trim());
+    }
+
+    private String localizeImportStatus(com.timetablebot.domain.schedule.ImportStatus status) {
+        return switch (status) {
+            case SUCCESS -> "УСПЕХ";
+            case PARTIAL -> "ЧАСТИЧНО";
+            case ERROR -> "ОШИБКА";
+        };
+    }
+
+    private String formatImportCreatedAt(java.time.Instant createdAt) {
+        return createdAt == null ? "unknown_time" : IMPORT_HISTORY_TIME_FORMATTER.format(createdAt);
+    }
+
+    private String truncate(String value, int maxLength) {
+        if (value == null || value.length() <= maxLength) {
+            return value;
+        }
+        return value.substring(0, maxLength) + "...";
     }
     
     private Mono<BotMessageResponse> deleteEvent(String userId, String args) {

@@ -1,6 +1,8 @@
 package com.timetablebot.application.schedule;
 
 import com.timetablebot.domain.schedule.EventType;
+import com.timetablebot.domain.schedule.ImportHistoryItem;
+import com.timetablebot.domain.schedule.ImportStatus;
 import com.timetablebot.domain.schedule.ScheduleEvent;
 import com.timetablebot.infrastructure.schedule.*;
 import org.springframework.stereotype.Component;
@@ -64,6 +66,11 @@ public class ScheduleModule {
                 .flatMap(payload -> importEvents(userId, parseCsv(payload), "external_api"));
     }
 
+    public Flux<ImportHistoryItem> importHistory(String userId) {
+        return importHistoryRepository.findTop20ByUserIdOrderByCreatedAtDesc(userId)
+                .map(this::toImportHistoryItem);
+    }
+
     private Mono<Integer> importEvents(String userId, ParseResult parseResult, String source) {
         List<ImportedEvent> importedEvents = parseResult.events();
         if (importedEvents.isEmpty()) {
@@ -80,10 +87,8 @@ public class ScheduleModule {
                         return Mono.error(new IllegalStateException("Лимит событий (5000) превышен."));
                     }
 
-                    return Flux.fromIterable(importedEvents)
-                            .flatMap(event -> saveNew(userId, event.type(), event.title(), event.place(), event.source(), event.startsAt(), event.endsAt()))
-                            .count()
-                            .map(Long::intValue);
+                    return saveImportedBatch(userId, importedEvents)
+                            .map(List::size);
                 })
                 .flatMap(count -> {
                     ImportStatus status = parseResult.errors().isEmpty() ? ImportStatus.SUCCESS : ImportStatus.PARTIAL;
@@ -92,6 +97,25 @@ public class ScheduleModule {
                 })
                 .onErrorResume(ex -> saveImportHistory(userId, source, ImportStatus.ERROR, 0, ex.getMessage()).then(Mono.error(ex)))
                 .doFinally(signalType -> activeImports.remove(userId));
+    }
+
+    private Mono<List<String>> saveImportedBatch(String userId, List<ImportedEvent> importedEvents) {
+        List<String> createdIds = new ArrayList<>();
+        return Flux.fromIterable(importedEvents)
+                .concatMap(event -> saveNew(userId, event.type(), event.title(), event.place(), event.source(), event.startsAt(), event.endsAt()))
+                .doOnNext(event -> createdIds.add(event.id()))
+                .map(ScheduleEvent::id)
+                .collectList()
+                .onErrorResume(ex -> rollbackImportedBatch(userId, createdIds).then(Mono.error(ex)));
+    }
+
+    private Mono<Void> rollbackImportedBatch(String userId, List<String> createdIds) {
+        if (createdIds.isEmpty()) {
+            return Mono.empty();
+        }
+        return Flux.fromIterable(createdIds)
+                .flatMap(id -> repository.deleteByIdAndUserId(id, userId))
+                .then();
     }
 
     public Mono<ScheduleEvent> updateEvent(String userId, String eventId, EventType type, String title, String place, Instant startsAt, Instant endsAt) {
@@ -146,6 +170,9 @@ public class ScheduleModule {
                     if (summary == null || dtStart == null || dtEnd == null) {
                         throw new IllegalArgumentException("не хватает обязательных полей VEVENT");
                     }
+                    if (summary.isBlank()) {
+                        throw new IllegalArgumentException("SUMMARY must not be blank");
+                    }
                     Instant startsAt = parseIcalInstant(dtStart);
                     Instant endsAt = parseIcalInstant(dtEnd);
                     if (!endsAt.isAfter(startsAt)) {
@@ -195,6 +222,9 @@ public class ScheduleModule {
                 String place = parts[2].trim();
                 Instant startsAt = Instant.parse(parts[3].trim());
                 Instant endsAt = Instant.parse(parts[4].trim());
+                if (title.isBlank()) {
+                    throw new IllegalArgumentException("title must not be blank");
+                }
                 if (!endsAt.isAfter(startsAt)) {
                     throw new IllegalArgumentException("end must be after start");
                 }
@@ -238,6 +268,16 @@ public class ScheduleModule {
         history.setErrorMessage(errorMessage);
         history.setCreatedAt(Instant.now());
         return importHistoryRepository.save(history).then();
+    }
+
+    private ImportHistoryItem toImportHistoryItem(ImportHistoryDocument doc) {
+        return new ImportHistoryItem(
+                doc.getSource(),
+                doc.getStatus(),
+                doc.getImportedCount(),
+                doc.getErrorMessage(),
+                doc.getCreatedAt()
+        );
     }
 
     private record ParseResult(List<ImportedEvent> events, List<String> errors) {

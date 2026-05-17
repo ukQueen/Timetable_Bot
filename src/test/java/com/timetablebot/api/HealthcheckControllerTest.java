@@ -20,8 +20,10 @@ class HealthcheckControllerTest {
     void shouldReturnHealthcheckStatus() {
         webTestClient.get()
                 .uri("/healthcheck")
+                .header("X-Request-Id", "req-health-1")
                 .exchange()
                 .expectStatus().isOk()
+                .expectHeader().valueEquals("X-Request-Id", "req-health-1")
                 .expectBody()
                 .jsonPath("$.status").value(status -> {
                     String value = String.valueOf(status);
@@ -31,7 +33,20 @@ class HealthcheckControllerTest {
                 })
                 .jsonPath("$.service").isEqualTo("timetable-bot")
                 .jsonPath("$.timestamp").exists()
+                .jsonPath("$.request_id").isEqualTo("req-health-1")
                 .jsonPath("$.dependencies.mongodb").exists()
-                .jsonPath("$.dependencies.rabbitmq").exists();
+                .jsonPath("$.dependencies.rabbitmq").exists()
+                .jsonPath("$.dependencies.telegram").exists();
+    }
+
+    @Test
+    void shouldGenerateRequestIdWhenHeaderMissing() {
+        webTestClient.get()
+                .uri("/healthcheck")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().exists("X-Request-Id")
+                .expectBody()
+                .jsonPath("$.request_id").exists();
     }
 }

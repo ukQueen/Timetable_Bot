@@ -1,4 +1,4 @@
-package com.timetablebot.infrastructure.schedule;
+package com.timetablebot.domain.schedule;
 
 public enum ImportStatus {
     SUCCESS,

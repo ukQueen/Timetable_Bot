@@ -190,4 +190,16 @@ class TelegramWebhookControllerTest {
                 .exchange().expectStatus().isOk().expectBody()
                 .jsonPath("$.status").isEqualTo("ok");
     }
+
+    @Test
+    void shouldReturnRequestIdHeaderFromFilter() {
+        webTestClient.post().uri("/telegram/webhook").contentType(MediaType.APPLICATION_JSON)
+                .header("X-Request-Id", "req-telegram-1")
+                .bodyValue("{\"message\":{\"chat\":{\"id\":1001},\"text\":\"/menu\"}}")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().valueEquals("X-Request-Id", "req-telegram-1")
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("ok");
+    }
 }

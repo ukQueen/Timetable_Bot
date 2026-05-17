@@ -1,5 +1,6 @@
 package com.timetablebot.infrastructure.schedule;
 
+import com.timetablebot.domain.schedule.ImportStatus;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
