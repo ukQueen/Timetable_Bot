@@ -77,7 +77,7 @@
 - [ ] Добавить аудит безопасности хранения ключей и секретов.
 
 ## 12) Тестирование
-- [x] Unit-тесты для бизнес-модулей и парсеров. *(добавлены `NotificationModuleTest`, `TaskReminderSchedulerTest`; покрытие парсеров — следующий шаг)*
+- [x] Unit-тесты для бизнес-модулей и парсеров. *(добавлены `NotificationModuleTest`, `TaskReminderSchedulerTest`, `ScheduleImportParsingTest`)*
 - [ ] Integration-тесты для MongoDB/RabbitMQ/внешних адаптеров (моки/тест-контейнеры).
 - [ ] E2E-сценарии по ключевым пользовательским потокам (`/start`, импорт, `/today`, напоминания).
 - [ ] Нагрузочные тесты для команд `/menu`, `/today`, `/tasks_today`.
