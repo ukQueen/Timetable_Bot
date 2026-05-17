@@ -5,10 +5,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Component
 public class TelegramBotClient {
+    private static final Duration SEND_TIMEOUT = Duration.ofSeconds(3);
+
     private final TelegramBotProperties properties;
     private final WebClient webClient;
 
@@ -22,9 +25,14 @@ public class TelegramBotClient {
             return Mono.empty();
         }
 
+        String normalizedText = text == null ? "" : text.trim();
+        if (normalizedText.isEmpty()) {
+            return Mono.empty();
+        }
+
         Map<String, Object> payload = Map.of(
                 "chat_id", chatId,
-                "text", text
+                "text", normalizedText
         );
 
         return webClient.post()
@@ -33,6 +41,7 @@ public class TelegramBotClient {
                 .bodyValue(payload)
                 .retrieve()
                 .toBodilessEntity()
+                .timeout(SEND_TIMEOUT)
                 .then();
     }
 }
