@@ -40,6 +40,28 @@ public class TaskModule {
         return tasksByRange(userId, now, now.plusDays(7), zoneId);
     }
 
+
+
+    public Mono<TaskItem> updateTask(String userId, String taskId, String title, Instant deadline, TaskPriority priority, TaskType type) {
+        return taskRepository.findByIdAndUserId(taskId, userId)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Задача не найдена.")))
+                .flatMap(doc -> {
+                    doc.setTitle(title);
+                    doc.setDeadline(deadline);
+                    doc.setPriority(priority);
+                    doc.setType(type);
+                    doc.setUpdatedAt(Instant.now());
+                    return taskRepository.save(doc);
+                })
+                .map(this::toDomain);
+    }
+
+    public Flux<TaskItem> overdueTasks(String userId, ZoneId zoneId) {
+        Instant now = LocalDateTime.now(zoneId).toInstant(ZoneOffset.UTC);
+        return taskRepository.findAllByUserIdAndStatusAndDeadlineBeforeOrderByDeadlineAsc(userId, TaskStatus.OPEN, now)
+                .map(this::toDomain);
+    }
+
     public Mono<TaskItem> markDone(String userId, String taskId) {
         return taskRepository.findByIdAndUserId(taskId, userId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Задача не найдена.")))

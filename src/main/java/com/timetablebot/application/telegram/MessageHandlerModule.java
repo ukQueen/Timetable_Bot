@@ -18,7 +18,7 @@ import java.util.List;
 
 @Component
 public class MessageHandlerModule {
-    private static final String MENU_MESSAGE = "Доступные команды:\n/start\n/menu\n/today\n/tomorrow\n/week\n/add_event title | place | start_iso | end_iso | LESSON|EXAM\n/edit_event id | title | place | start_iso | end_iso | LESSON|EXAM\n/delete_event id\n/import_timetable <CSV или iCal>\n/import_external <url_csv>\n/add_task title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER\n/tasks_today\n/tasks_week\n/done_task id\n/delete_task id\n...";    private static final String INPUT_ERROR_MESSAGE = "Неверная команда. Используйте /menu, чтобы увидеть доступные действия.";
+    private static final String MENU_MESSAGE = "Доступные команды:\n/start\n/menu\n/today\n/tomorrow\n/week\n/add_event title | place | start_iso | end_iso | LESSON|EXAM\n/edit_event id | title | place | start_iso | end_iso | LESSON|EXAM\n/delete_event id\n/import_timetable <CSV или iCal>\n/import_external <url_csv>\n/add_task title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER\n/tasks_today\n/tasks_week\n/done_task id\n/delete_task id\n/edit_task id | title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER\n/tasks_overdue";    private static final String INPUT_ERROR_MESSAGE = "Неверная команда. Используйте /menu, чтобы увидеть доступные действия.";
 
     private final UserModule userModule;
     private final ScheduleModule scheduleModule;
@@ -63,6 +63,8 @@ public class MessageHandlerModule {
             case "/tasks_week" -> userModule.createIfAbsent(userId).flatMap(profile -> taskModule.tasksForWeek(userId, ZoneId.of(profile.timezone())).collectList()).map(this::formatTasks);
             case "/done_task" -> doneTask(userId, args);
             case "/delete_task" -> deleteTask(userId, args);
+            case "/edit_task" -> editTask(userId, args);
+            case "/tasks_overdue" -> userModule.createIfAbsent(userId).flatMap(profile -> taskModule.overdueTasks(userId, ZoneId.of(profile.timezone())).collectList()).map(tasks -> formatTasks("Просроченные задачи", tasks));
             default -> Mono.just(BotMessageResponse.error(INPUT_ERROR_MESSAGE));
         };
     }
@@ -98,6 +100,19 @@ public class MessageHandlerModule {
         }
     }
 
+
+
+    private Mono<BotMessageResponse> editTask(String userId, String args) {
+        try {
+            String[] parts = splitPipe(args, 5);
+            return taskModule.updateTask(userId, parts[0], parts[1], Instant.parse(parts[2]), TaskPriority.valueOf(parts[3]), TaskType.valueOf(parts[4]))
+                    .map(task -> BotMessageResponse.ok("Задача обновлена: " + task.title()))
+                    .onErrorResume(ex -> Mono.just(BotMessageResponse.error(ex.getMessage())));
+        } catch (Exception ex) {
+            return Mono.just(BotMessageResponse.error("Формат: /edit_task id | title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER"));
+        }
+    }
+
     private Mono<BotMessageResponse> doneTask(String userId, String args) {
         String id = args.trim();
         if (id.isEmpty()) return Mono.just(BotMessageResponse.error("Формат: /done_task id"));
@@ -113,12 +128,16 @@ public class MessageHandlerModule {
     }
 
     private BotMessageResponse formatTasks(List<TaskItem> tasks) {
+        return formatTasks("Задачи", tasks);
+    }
+
+    private BotMessageResponse formatTasks(String header, List<TaskItem> tasks) {
         if (tasks.isEmpty()) {
-            return BotMessageResponse.ok("Задачи не найдены.");
+            return BotMessageResponse.ok(header + ": не найдено.");
         }
-        StringBuilder b = new StringBuilder("Задачи:\n");
+        StringBuilder b = new StringBuilder(header + ":\n");
         for (TaskItem t : tasks) {
-            b.append("• ").append(t.title()).append(" [").append(t.status()).append("] ").append(t.deadline()).append("\n");
+            b.append("• ").append(t.id()).append(" | ").append(t.title()).append(" | ").append(t.priority()).append(" | ").append(t.status()).append(" | ").append(t.deadline()).append("\n");
         }
         return BotMessageResponse.ok(b.toString().trim());
     }

@@ -90,6 +90,7 @@ class TelegramWebhookControllerTest {
         given(taskRepository.save(any(TaskDocument.class))).willReturn(Mono.just(task));
         given(taskRepository.findAllByUserIdAndDeadlineBetweenOrderByDeadlineAsc(any(), any(), any())).willReturn(Flux.just(task));
         given(taskRepository.findByIdAndUserId(eq("t1"), any())).willReturn(Mono.just(task));
+        given(taskRepository.findAllByUserIdAndStatusAndDeadlineBeforeOrderByDeadlineAsc(any(), any(), any())).willReturn(Flux.just(task));
         given(taskRepository.deleteByIdAndUserId(eq("t1"), any())).willReturn(Mono.empty());
         given(telegramBotClient.sendMessage(any(), any())).willReturn(Mono.empty());
     }
@@ -156,6 +157,16 @@ class TelegramWebhookControllerTest {
                 .jsonPath("$.status").isEqualTo("ok");
 
         verify(telegramBotClient).sendMessage(eq(1001L), any());
+    }
+    @Test
+    void shouldEditAndListOverdueTasks() {
+        webTestClient.post().uri("/telegram/webhook").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\"message\":{\"chat\":{\"id\":1001},\"text\":\"/edit_task t1 | Updated HW | 2026-05-14T12:00:00Z | MEDIUM | LAB\"}}")
+                .exchange().expectStatus().isOk().expectBody().jsonPath("$.status").isEqualTo("ok");
+
+        webTestClient.post().uri("/telegram/webhook").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\"message\":{\"chat\":{\"id\":1001},\"text\":\"/tasks_overdue\"}}")
+                .exchange().expectStatus().isOk().expectBody().jsonPath("$.status").isEqualTo("ok");
     }
 
     @Test

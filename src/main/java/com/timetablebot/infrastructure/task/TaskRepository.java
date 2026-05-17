@@ -10,4 +10,5 @@ public interface TaskRepository extends ReactiveCrudRepository<TaskDocument, Str
     Flux<TaskDocument> findAllByUserIdAndDeadlineBetweenOrderByDeadlineAsc(String userId, Instant from, Instant to);
     Mono<TaskDocument> findByIdAndUserId(String id, String userId);
     Mono<Void> deleteByIdAndUserId(String id, String userId);
+    Flux<TaskDocument> findAllByUserIdAndStatusAndDeadlineBeforeOrderByDeadlineAsc(String userId, com.timetablebot.domain.user.TaskStatus status, Instant before);
 }
