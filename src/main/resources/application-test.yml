@@ -27,3 +27,8 @@ spring:
       queue: notifications.queue
       task-reminder-lead-minutes: 30
       scheduler-fixed-delay-ms: 60000
+
+      dlq:
+        exchange: notifications.dlx
+        queue: notifications.queue.dlq
+        routing-key: notifications.dead
