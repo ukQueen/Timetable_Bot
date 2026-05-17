@@ -3,6 +3,7 @@ package com.timetablebot.api.telegram;
 import com.timetablebot.application.telegram.MessageHandlerModule;
 import com.timetablebot.application.telegram.dto.BotMessageResponse;
 import com.timetablebot.application.telegram.dto.TelegramUpdateRequest;
+import com.timetablebot.infrastructure.telegram.TelegramBotClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,13 +15,20 @@ import reactor.core.publisher.Mono;
 @RequestMapping(path = "/telegram", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TelegramWebhookController {
     private final MessageHandlerModule messageHandlerModule;
+    private final TelegramBotClient telegramBotClient;
 
-    public TelegramWebhookController(MessageHandlerModule messageHandlerModule) {
+    public TelegramWebhookController(MessageHandlerModule messageHandlerModule, TelegramBotClient telegramBotClient) {
         this.messageHandlerModule = messageHandlerModule;
+        this.telegramBotClient = telegramBotClient;
     }
 
     @PostMapping(path = "/webhook", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<BotMessageResponse> handleMessage(@RequestBody TelegramUpdateRequest update) {
-        return messageHandlerModule.handle(update);
+        Long chatId = update != null && update.message() != null && update.message().chat() != null
+                ? update.message().chat().id()
+                : null;
+
+        return messageHandlerModule.handle(update)
+                .flatMap(response -> telegramBotClient.sendMessage(chatId, response.message()).thenReturn(response));
     }
 }

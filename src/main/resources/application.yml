@@ -18,3 +18,8 @@ admin:
     username: ${ADMIN_USERNAME:admin}
     password: ${ADMIN_PASSWORD:admin123}
     token: ${ADMIN_TOKEN:dev-admin-token}
+
+telegram:
+  bot:
+    enabled: ${TELEGRAM_BOT_ENABLED:false}
+    token: ${TELEGRAM_BOT_TOKEN:}
