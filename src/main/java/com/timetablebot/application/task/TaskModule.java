@@ -57,7 +57,7 @@ public class TaskModule {
     }
 
     public Flux<TaskItem> overdueTasks(String userId, ZoneId zoneId) {
-        Instant now = LocalDateTime.now(zoneId).toInstant(ZoneOffset.UTC);
+        Instant now = ZonedDateTime.now(zoneId).toInstant();
         return taskRepository.findAllByUserIdAndStatusAndDeadlineBeforeOrderByDeadlineAsc(userId, TaskStatus.OPEN, now)
                 .map(this::toDomain);
     }

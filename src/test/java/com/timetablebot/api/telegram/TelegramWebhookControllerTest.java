@@ -170,6 +170,17 @@ class TelegramWebhookControllerTest {
     }
 
     @Test
+    void shouldAcceptLowercaseEnumsForTaskCommands() {
+        webTestClient.post().uri("/telegram/webhook").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\"message\":{\"chat\":{\"id\":1001},\"text\":\"/add_task HW lower | 2026-05-13T12:00:00Z | high | homework\"}}")
+                .exchange().expectStatus().isOk().expectBody().jsonPath("$.status").isEqualTo("ok");
+
+        webTestClient.post().uri("/telegram/webhook").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\"message\":{\"chat\":{\"id\":1001},\"text\":\"/edit_task t1 | Updated Lower | 2026-05-14T12:00:00Z | medium | lab\"}}")
+                .exchange().expectStatus().isOk().expectBody().jsonPath("$.status").isEqualTo("ok");
+    }
+
+    @Test
     void shouldDeleteOwnEvent() {
         webTestClient.post().uri("/telegram/webhook").contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\"message\":{\"chat\":{\"id\":1001},\"text\":\"/delete_event e1\"}}")

@@ -18,7 +18,27 @@ import java.util.List;
 
 @Component
 public class MessageHandlerModule {
-    private static final String MENU_MESSAGE = "Доступные команды:\n/start\n/menu\n/today\n/tomorrow\n/week\n/add_event title | place | start_iso | end_iso | LESSON|EXAM\n/edit_event id | title | place | start_iso | end_iso | LESSON|EXAM\n/delete_event id\n/import_timetable <CSV или iCal>\n/import_external <url_csv>\n/add_task title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER\n/tasks_today\n/tasks_week\n/done_task id\n/delete_task id\n/edit_task id | title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER\n/tasks_overdue";    private static final String INPUT_ERROR_MESSAGE = "Неверная команда. Используйте /menu, чтобы увидеть доступные действия.";
+    private static final String MENU_MESSAGE = """
+Доступные команды:
+/start
+/menu
+/today
+/tomorrow
+/week
+/add_event title | place | start_iso | end_iso | LESSON|EXAM
+/edit_event id | title | place | start_iso | end_iso | LESSON|EXAM
+/delete_event id
+/import_timetable <CSV или iCal>
+/import_external <url_csv>
+/add_task title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER
+/edit_task id | title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER
+/tasks_today
+/tasks_week
+/tasks_overdue
+/done_task id
+/delete_task id
+""";
+    private static final String INPUT_ERROR_MESSAGE = "Неверная команда. Используйте /menu, чтобы увидеть доступные действия.";
 
     private final UserModule userModule;
     private final ScheduleModule scheduleModule;
@@ -93,7 +113,7 @@ public class MessageHandlerModule {
     private Mono<BotMessageResponse> addTask(String userId, String args) {
         try {
             String[] parts = splitPipe(args, 4);
-            return taskModule.createTask(userId, parts[0], Instant.parse(parts[1]), TaskPriority.valueOf(parts[2]), TaskType.valueOf(parts[3]))
+            return taskModule.createTask(userId, parts[0], Instant.parse(parts[1]), parseTaskPriority(parts[2]), parseTaskType(parts[3]))
                     .map(task -> BotMessageResponse.ok("Задача создана: " + task.title()));
         } catch (Exception ex) {
             return Mono.just(BotMessageResponse.error("Формат: /add_task title | deadline_iso | LOW|MEDIUM|HIGH | HOMEWORK|LAB|COURSEWORK|OTHER"));
@@ -105,7 +125,7 @@ public class MessageHandlerModule {
     private Mono<BotMessageResponse> editTask(String userId, String args) {
         try {
             String[] parts = splitPipe(args, 5);
-            return taskModule.updateTask(userId, parts[0], parts[1], Instant.parse(parts[2]), TaskPriority.valueOf(parts[3]), TaskType.valueOf(parts[4]))
+            return taskModule.updateTask(userId, parts[0], parts[1], Instant.parse(parts[2]), parseTaskPriority(parts[3]), parseTaskType(parts[4]))
                     .map(task -> BotMessageResponse.ok("Задача обновлена: " + task.title()))
                     .onErrorResume(ex -> Mono.just(BotMessageResponse.error(ex.getMessage())));
         } catch (Exception ex) {
@@ -140,6 +160,16 @@ public class MessageHandlerModule {
             b.append("• ").append(t.id()).append(" | ").append(t.title()).append(" | ").append(t.priority()).append(" | ").append(t.status()).append(" | ").append(t.deadline()).append("\n");
         }
         return BotMessageResponse.ok(b.toString().trim());
+    }
+
+
+
+    private TaskPriority parseTaskPriority(String raw) {
+        return TaskPriority.valueOf(raw.trim().toUpperCase());
+    }
+
+    private TaskType parseTaskType(String raw) {
+        return TaskType.valueOf(raw.trim().toUpperCase());
     }
 
     private String[] splitPipe(String args, int expected) {
