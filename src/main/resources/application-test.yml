@@ -18,3 +18,4 @@ telegram:
   bot:
     enabled: false
     token: ""
+    webhook-secret: ""
