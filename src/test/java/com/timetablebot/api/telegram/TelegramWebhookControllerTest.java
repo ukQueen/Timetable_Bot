@@ -14,6 +14,7 @@ import com.timetablebot.infrastructure.task.TaskDocument;
 import com.timetablebot.infrastructure.task.TaskRepository;
 
 import com.timetablebot.infrastructure.user.UserDocument;
+import com.timetablebot.infrastructure.telegram.TelegramBotClient;
 import com.timetablebot.infrastructure.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import java.time.Instant;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -48,6 +50,8 @@ class TelegramWebhookControllerTest {
     private ExternalTimetableClient externalTimetableClient;
     @MockBean
     private TaskRepository taskRepository;
+    @MockBean
+    private TelegramBotClient telegramBotClient;
 
     @BeforeEach
     void setUp() {
@@ -78,15 +82,16 @@ class TelegramWebhookControllerTest {
         given(importHistoryRepository.save(any(ImportHistoryDocument.class))).willReturn(Mono.just(new ImportHistoryDocument()));
         given(externalTimetableClient.download(eq("https://example.com/timetable.csv"))).willReturn(Mono.just("LESSON,Math,A-101,2026-05-13T10:00:00Z,2026-05-13T11:00:00Z"));
 
-            TaskDocument task = new TaskDocument();
-            task.setId("t1");
-            task.setUserId("1001");
-            task.setTitle("HW");
-            task.setDeadline(Instant.parse("2026-05-13T12:00:00Z"));
+        TaskDocument task = new TaskDocument();
+        task.setId("t1");
+        task.setUserId("1001");
+        task.setTitle("HW");
+        task.setDeadline(Instant.parse("2026-05-13T12:00:00Z"));
         given(taskRepository.save(any(TaskDocument.class))).willReturn(Mono.just(task));
         given(taskRepository.findAllByUserIdAndDeadlineBetweenOrderByDeadlineAsc(any(), any(), any())).willReturn(Flux.just(task));
         given(taskRepository.findByIdAndUserId(eq("t1"), any())).willReturn(Mono.just(task));
         given(taskRepository.deleteByIdAndUserId(eq("t1"), any())).willReturn(Mono.empty());
+        given(telegramBotClient.sendMessage(any(), any())).willReturn(Mono.empty());
     }
 
     @Test
@@ -141,6 +146,17 @@ class TelegramWebhookControllerTest {
                 .exchange().expectStatus().isOk().expectBody().jsonPath("$.status").isEqualTo("ok");
     }
 
+    @Test
+    void shouldReturnResponseEvenWhenTelegramSendFails() {
+        given(telegramBotClient.sendMessage(any(), any())).willReturn(Mono.error(new RuntimeException("telegram down")));
+
+        webTestClient.post().uri("/telegram/webhook").contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\"message\":{\"chat\":{\"id\":1001},\"text\":\"/menu\"}}")
+                .exchange().expectStatus().isOk().expectBody()
+                .jsonPath("$.status").isEqualTo("ok");
+
+        verify(telegramBotClient).sendMessage(eq(1001L), any());
+    }
 
     @Test
     void shouldDeleteOwnEvent() {

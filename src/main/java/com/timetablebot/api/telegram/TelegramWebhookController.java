@@ -4,6 +4,8 @@ import com.timetablebot.application.telegram.MessageHandlerModule;
 import com.timetablebot.application.telegram.dto.BotMessageResponse;
 import com.timetablebot.application.telegram.dto.TelegramUpdateRequest;
 import com.timetablebot.infrastructure.telegram.TelegramBotClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping(path = "/telegram", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TelegramWebhookController {
+    private static final Logger log = LoggerFactory.getLogger(TelegramWebhookController.class);
+
     private final MessageHandlerModule messageHandlerModule;
     private final TelegramBotClient telegramBotClient;
 
@@ -29,6 +33,9 @@ public class TelegramWebhookController {
                 : null;
 
         return messageHandlerModule.handle(update)
-                .flatMap(response -> telegramBotClient.sendMessage(chatId, response.message()).thenReturn(response));
+                .flatMap(response -> telegramBotClient.sendMessage(chatId, response.message())
+                        .doOnError(ex -> log.warn("Failed to send Telegram message to chatId={}", chatId, ex))
+                        .onErrorResume(ex -> Mono.empty())
+                        .thenReturn(response));
     }
 }
