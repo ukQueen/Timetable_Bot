@@ -20,6 +20,26 @@ public class TelegramBotClient {
         this.webClient = builder.baseUrl("https://api.telegram.org").build();
     }
 
+
+    public Mono<Void> registerWebhook(String webhookUrl, String webhookSecret) {
+        if (!properties.enabled() || properties.token() == null || properties.token().isBlank() || webhookUrl == null || webhookUrl.isBlank()) {
+            return Mono.empty();
+        }
+
+        Map<String, Object> payload = webhookSecret == null || webhookSecret.isBlank()
+                ? Map.of("url", webhookUrl)
+                : Map.of("url", webhookUrl, "secret_token", webhookSecret);
+
+        return webClient.post()
+                .uri("/bot{token}/setWebhook", properties.token())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(payload)
+                .retrieve()
+                .toBodilessEntity()
+                .timeout(SEND_TIMEOUT)
+                .then();
+    }
+
     public Mono<Void> sendMessage(Long chatId, String text) {
         if (!properties.enabled() || properties.token() == null || properties.token().isBlank() || chatId == null) {
             return Mono.empty();

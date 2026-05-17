@@ -19,3 +19,5 @@ telegram:
     enabled: false
     token: ""
     webhook-secret: ""
+    webhook-url: ""
+    register-webhook-on-startup: false

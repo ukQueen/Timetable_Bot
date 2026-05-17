@@ -3,5 +3,11 @@ package com.timetablebot.infrastructure.telegram;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "telegram.bot")
-public record TelegramBotProperties(String token, boolean enabled, String webhookSecret) {
+public record TelegramBotProperties(
+        String token,
+        boolean enabled,
+        String webhookSecret,
+        String webhookUrl,
+        boolean registerWebhookOnStartup
+) {
 }
