@@ -44,6 +44,7 @@ class MessageHandlerModuleTest {
                 new TelegramUpdateRequest.Message(
                         1L,
                         new TelegramUpdateRequest.Chat(1001L),
+                        new TelegramUpdateRequest.User(42L, "u", "f", "l"),
                         "/imports"
                 )
         );
@@ -70,13 +71,14 @@ class MessageHandlerModuleTest {
                 new TelegramUpdateRequest.Message(
                         1L,
                         new TelegramUpdateRequest.Chat(1001L),
+                        new TelegramUpdateRequest.User(42L, "u", "f", "l"),
                         "/imports"
                 )
         );
 
         StepVerifier.create(module.handle(update))
                 .expectNextMatches(response ->
-                        response.success()
+                        "ok".equals(response.status())
                                 && response.message().contains("ОШИБКА")
                                 && response.message().contains("error=VEVENT #2"))
                 .verifyComplete();
@@ -96,11 +98,11 @@ class MessageHandlerModuleTest {
         when(scheduleModule.importHistory("1001")).thenReturn(Flux.just(history));
 
         TelegramUpdateRequest update = new TelegramUpdateRequest(
-                new TelegramUpdateRequest.Message(1L, new TelegramUpdateRequest.Chat(1001L), "/imports")
+                new TelegramUpdateRequest.Message(1L, new TelegramUpdateRequest.Chat(1001L), new TelegramUpdateRequest.User(42L, "u", "f", "l"), "/imports")
         );
 
         StepVerifier.create(module.handle(update))
-                .expectNextMatches(response -> response.success()
+                .expectNextMatches(response -> "ok".equals(response.status())
                         && response.message().contains("...")
                         && !response.message().contains("E".repeat(250)))
                 .verifyComplete();
@@ -113,12 +115,13 @@ class MessageHandlerModuleTest {
                 new TelegramUpdateRequest.Message(
                         1L,
                         new TelegramUpdateRequest.Chat(1001L),
+                        new TelegramUpdateRequest.User(42L, "u", "f", "l"),
                         "/menu"
                 )
         );
 
         StepVerifier.create(module.handle(update))
-                .expectNextMatches(response -> response.success() && response.message().contains("/imports"))
+                .expectNextMatches(response -> "ok".equals(response.status()) && response.message().contains("/imports"))
                 .verifyComplete();
     }
 
@@ -131,6 +134,7 @@ class MessageHandlerModuleTest {
                 new TelegramUpdateRequest.Message(
                         1L,
                         new TelegramUpdateRequest.Chat(1001L),
+                        new TelegramUpdateRequest.User(42L, "u", "f", "l"),
                         "/imports"
                 )
         );
@@ -142,7 +146,7 @@ class MessageHandlerModuleTest {
 
     private boolean isExpectedImportResponse(BotMessageResponse response, String status, String importedCount) {
         return response != null
-                && response.success()
+                && "ok".equals(response.status())
                 && response.message().contains("Последние импорты:")
                 && response.message().contains(status)
                 && response.message().contains(importedCount);

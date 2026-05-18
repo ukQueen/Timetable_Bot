@@ -1,6 +1,5 @@
 package com.timetablebot.infrastructure.observability;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -21,11 +20,12 @@ public class RequestIdWebFilter implements WebFilter {
             requestId = UUID.randomUUID().toString();
         }
 
+        final String finalRequestId = requestId;
         ServerWebExchange mutatedExchange = exchange.mutate()
-                .request(builder -> builder.header(REQUEST_ID_HEADER, requestId))
+                .request(builder -> builder.header(REQUEST_ID_HEADER, finalRequestId))
                 .build();
-        exchange.getResponse().getHeaders().set(REQUEST_ID_HEADER, requestId);
-        mutatedExchange.getAttributes().put(REQUEST_ID_HEADER, requestId);
+        exchange.getResponse().getHeaders().set(REQUEST_ID_HEADER, finalRequestId);
+        mutatedExchange.getAttributes().put(REQUEST_ID_HEADER, finalRequestId);
         return chain.filter(mutatedExchange);
     }
 }

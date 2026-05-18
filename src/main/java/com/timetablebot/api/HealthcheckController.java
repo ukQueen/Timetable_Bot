@@ -1,6 +1,7 @@
 package com.timetablebot.api;
 
 import com.rabbitmq.client.Channel;
+import com.timetablebot.infrastructure.telegram.TelegramBotClient;
 import com.timetablebot.infrastructure.telegram.TelegramBotProperties;
 import com.timetablebot.infrastructure.observability.RequestIdWebFilter;
 import org.springframework.amqp.rabbit.connection.Connection;
@@ -28,13 +29,16 @@ public class HealthcheckController {
     private final ObjectProvider<ReactiveMongoTemplate> mongoTemplateProvider;
     private final ObjectProvider<ConnectionFactory> rabbitConnectionFactoryProvider;
     private final ObjectProvider<TelegramBotProperties> telegramBotPropertiesProvider;
+    private final ObjectProvider<TelegramBotClient> telegramBotClientProvider;
 
     public HealthcheckController(ObjectProvider<ReactiveMongoTemplate> mongoTemplateProvider,
                                  ObjectProvider<ConnectionFactory> rabbitConnectionFactoryProvider,
-                                 ObjectProvider<TelegramBotProperties> telegramBotPropertiesProvider) {
+                                 ObjectProvider<TelegramBotProperties> telegramBotPropertiesProvider,
+                                 ObjectProvider<TelegramBotClient> telegramBotClientProvider) {
         this.mongoTemplateProvider = mongoTemplateProvider;
         this.rabbitConnectionFactoryProvider = rabbitConnectionFactoryProvider;
         this.telegramBotPropertiesProvider = telegramBotPropertiesProvider;
+        this.telegramBotClientProvider = telegramBotClientProvider;
     }
 
 
@@ -114,9 +118,15 @@ public class HealthcheckController {
         if (properties == null || !properties.enabled()) {
             return Mono.just("UNKNOWN");
         }
-        return (properties.token() == null || properties.token().isBlank())
-                ? Mono.just("DEGRADED")
-                : Mono.just("UP");
+
+        TelegramBotClient telegramBotClient = telegramBotClientProvider.getIfAvailable();
+        if (telegramBotClient == null) {
+            return Mono.just("DEGRADED");
+        }
+
+        return telegramBotClient.healthProbe()
+                .timeout(DEPENDENCY_TIMEOUT)
+                .onErrorReturn("DEGRADED");
     }
 
     private boolean isDown(String dependencyStatus) {

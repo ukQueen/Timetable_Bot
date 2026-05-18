@@ -39,6 +39,22 @@ public class TelegramBotClient {
                 .timeout(SEND_TIMEOUT)
                 .then();
     }
+    public Mono<String> healthProbe() {
+        if (!properties.enabled()) {
+            return Mono.just("UNKNOWN");
+        }
+        if (properties.token() == null || properties.token().isBlank()) {
+            return Mono.just("DEGRADED");
+        }
+
+        return webClient.get()
+                .uri("/bot{token}/getMe", properties.token())
+                .retrieve()
+                .toBodilessEntity()
+                .timeout(SEND_TIMEOUT)
+                .map(ignored -> "UP")
+                .onErrorReturn("DEGRADED");
+    }
 
     public Mono<Void> sendMessage(Long chatId, String text) {
         if (!properties.enabled() || properties.token() == null || properties.token().isBlank() || chatId == null) {
