@@ -4,17 +4,30 @@ Lessons and Exams Timetable Bot
 
 ## Локальный запуск
 ### Требования
-- Java 21+
+- Java 25+
 - Maven 3.9+
 - Docker + Docker Compose
 
-### Поднять зависимости
+### Запуск всего приложения в Docker (рекомендуется)
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
-### Запустить приложение
+Это поднимет `mongodb`, `rabbitmq` и `app` как отдельные контейнеры.
+
+Логи приложения:
 ```bash
+docker compose logs -f app
+```
+
+Остановка:
+```bash
+docker compose down
+```
+
+### Альтернатива: локальный запуск приложения без контейнера
+```bash
+docker compose up -d mongodb rabbitmq
 mvn package
 java -jar target/timetable-bot-0.1.0-SNAPSHOT.jar
 ```
@@ -31,6 +44,45 @@ SERVER_PORT=8090 java -jar target/timetable-bot-0.1.0-SNAPSHOT.jar
 ### Проверка healthcheck
 ```bash
 curl -H "X-Request-Id: local-check-1" http://localhost:8080/healthcheck
+```
+
+## Submission checklist
+- GitHub Repository Link: `<ADD_GITHUB_REPO_LINK>`
+- Docker Hub Link: `<ADD_DOCKER_HUB_LINK>`
+- Telegram Bot Link or Username: `<ADD_TELEGRAM_BOT_LINK_OR_USERNAME>`
+
+## Docker deployment (submission-ready)
+1. Build image locally:
+```bash
+docker build -t <dockerhub_user>/timetable-bot:latest .
+```
+2. Push to Docker Hub:
+```bash
+docker push <dockerhub_user>/timetable-bot:latest
+```
+3. Run published image:
+```bash
+docker run --rm -p 8080:8080 --env-file .env <dockerhub_user>/timetable-bot:latest
+```
+
+## Telegram bot interaction
+1. Configure `.env` (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_URL`, `TELEGRAM_WEBHOOK_SECRET`).
+2. Start stack (`docker compose up -d --build`).
+3. Open your bot in Telegram and use `/start`, then `/menu`.
+
+
+## HTTP API (admin)
+1. Получить токен администратора:
+```bash
+curl -X POST http://localhost:8080/auth   -H "Content-Type: application/json"   -d '{"username":"admin","password":"admin123"}'
+```
+2. Проверить доступ администратора:
+```bash
+curl http://localhost:8080/admin/whoami -H "Authorization: Bearer <ADMIN_TOKEN>"
+```
+3. Получить список пользователей:
+```bash
+curl http://localhost:8080/admin/users -H "Authorization: Bearer <ADMIN_TOKEN>"
 ```
 
 ## Команды бота

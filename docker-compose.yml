@@ -19,5 +19,24 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: timetable-app
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      MONGODB_URI: mongodb://mongodb:27017/timetable_bot
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+
 volumes:
   mongodb_data:
