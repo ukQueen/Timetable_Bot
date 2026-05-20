@@ -2,6 +2,7 @@ package com.timetablebot.api;
 
 import com.rabbitmq.client.Channel;
 import com.timetablebot.infrastructure.observability.RequestIdWebFilter;
+import com.timetablebot.infrastructure.telegram.TelegramBotClient;
 import com.timetablebot.infrastructure.telegram.TelegramBotProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.connection.Connection;
@@ -29,7 +30,7 @@ class HealthcheckControllerUnitTest {
         when(connection.isOpen()).thenReturn(true);
         when(channel.isOpen()).thenReturn(true);
 
-        HealthcheckController controller = new HealthcheckController(provider(mongoTemplate), provider(connectionFactory), provider(new TelegramBotProperties("token", true, "", "", false)));
+        HealthcheckController controller = new HealthcheckController(provider(mongoTemplate), provider(connectionFactory), provider(new TelegramBotProperties("token", true, "", "", false)), provider(upTelegramClient()), "Alice,Bob");
         MockServerHttpRequest request = MockServerHttpRequest.method(HttpMethod.GET, "/healthcheck")
                 .header(RequestIdWebFilter.REQUEST_ID_HEADER, "req-1")
                 .build();
@@ -38,13 +39,14 @@ class HealthcheckControllerUnitTest {
                 .assertNext(payload -> {
                     org.junit.jupiter.api.Assertions.assertEquals("UP", payload.get("status"));
                     org.junit.jupiter.api.Assertions.assertEquals("req-1", payload.get("request_id"));
+                    org.junit.jupiter.api.Assertions.assertEquals(java.util.List.of("Alice", "Bob"), payload.get("authors"));
                 })
                 .verifyComplete();
     }
 
     @Test
     void shouldReturnDownWhenProvidersUnavailable() {
-        HealthcheckController controller = new HealthcheckController(provider(null), provider(null), provider(null));
+        HealthcheckController controller = new HealthcheckController(provider(null), provider(null), provider(null), provider(null), "Alice,Bob");
 
         StepVerifier.create(controller.healthcheck(MockServerHttpRequest.get("/healthcheck").build()))
                 .assertNext(payload -> org.junit.jupiter.api.Assertions.assertEquals("DOWN", payload.get("status")))
@@ -64,7 +66,7 @@ class HealthcheckControllerUnitTest {
         when(connection.isOpen()).thenReturn(true);
         when(channel.isOpen()).thenReturn(true);
 
-        HealthcheckController controller = new HealthcheckController(provider(mongoTemplate), provider(connectionFactory), provider(new TelegramBotProperties("token", true, "", "", false)));
+        HealthcheckController controller = new HealthcheckController(provider(mongoTemplate), provider(connectionFactory), provider(new TelegramBotProperties("token", true, "", "", false)), provider(upTelegramClient()), "Alice,Bob");
 
         StepVerifier.create(controller.healthcheck(MockServerHttpRequest.get("/healthcheck").build()))
                 .assertNext(payload -> org.junit.jupiter.api.Assertions.assertEquals("DEGRADED", payload.get("status")))
@@ -79,7 +81,7 @@ class HealthcheckControllerUnitTest {
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
         when(connectionFactory.createConnection()).thenThrow(new RuntimeException("rabbit down"));
 
-        HealthcheckController controller = new HealthcheckController(provider(mongoTemplate), provider(connectionFactory), provider(new TelegramBotProperties("token", true, "", "", false)));
+        HealthcheckController controller = new HealthcheckController(provider(mongoTemplate), provider(connectionFactory), provider(new TelegramBotProperties("token", true, "", "", false)), provider(upTelegramClient()), "Alice,Bob");
 
         StepVerifier.create(controller.healthcheck(MockServerHttpRequest.get("/healthcheck").build()))
                 .assertNext(payload -> org.junit.jupiter.api.Assertions.assertEquals("DEGRADED", payload.get("status")))
@@ -100,13 +102,20 @@ class HealthcheckControllerUnitTest {
         when(channel.isOpen()).thenReturn(true);
 
         TelegramBotProperties properties = new TelegramBotProperties("", true, "", "", false);
-        HealthcheckController controller = new HealthcheckController(provider(mongoTemplate), provider(connectionFactory), provider(properties));
+        HealthcheckController controller = new HealthcheckController(provider(mongoTemplate), provider(connectionFactory), provider(properties), provider(null), "Alice,Bob");
 
         StepVerifier.create(controller.healthcheck(MockServerHttpRequest.get("/healthcheck").build()))
                 .assertNext(payload -> org.junit.jupiter.api.Assertions.assertEquals("DEGRADED", payload.get("status")))
                 .verifyComplete();
     }
 
+
+
+    private TelegramBotClient upTelegramClient() {
+        TelegramBotClient telegramBotClient = mock(TelegramBotClient.class);
+        when(telegramBotClient.healthProbe()).thenReturn(reactor.core.publisher.Mono.just("UP"));
+        return telegramBotClient;
+    }
     private <T> ObjectProvider<T> provider(T value) {
         ObjectProvider<T> provider = mock(ObjectProvider.class);
         when(provider.getIfAvailable()).thenReturn(value);

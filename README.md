@@ -1,6 +1,7 @@
 # Timetable_Bot
 Lessons and Exams Timetable Bot
 
+
 ## Локальный запуск
 ### Требования
 - Java 21+
@@ -14,8 +15,18 @@ docker compose up -d
 
 ### Запустить приложение
 ```bash
-mvn spring-boot:run
+mvn package
+java -jar target/timetable-bot-0.1.0-SNAPSHOT.jar
 ```
+
+По умолчанию сервер стартует на `8080`. Для изменения порта задай `SERVER_PORT`, например:
+```bash
+SERVER_PORT=8090 java -jar target/timetable-bot-0.1.0-SNAPSHOT.jar
+```
+
+### Troubleshooting
+- Если `docker compose` показывает предупреждение про `version is obsolete`, убедись что в `docker-compose.yml` нет поля `version` (в этом проекте уже удалено).
+- Если `mvn package` падает на `testCompile`, обнови ветку (`git pull`) и временно запусти: `mvn -DskipTests package`, затем `java -jar target/timetable-bot-0.1.0-SNAPSHOT.jar`.
 
 ### Проверка healthcheck
 ```bash
@@ -53,6 +64,56 @@ CATEGORIES:EXAM
 END:VEVENT
 END:VCALENDAR
 ```
+
+## Секреты в .env
+1. Создай файл `.env` в корне проекта (рядом с `pom.xml`).
+2. Добавь туда секреты и переменные окружения. Пример:
+
+```env
+TELEGRAM_BOT_ENABLED=true
+TELEGRAM_BOT_TOKEN=123456:ABCDEF
+TELEGRAM_WEBHOOK_SECRET=your-webhook-secret
+TELEGRAM_WEBHOOK_URL=https://example.com/telegram/webhook
+TELEGRAM_REGISTER_WEBHOOK_ON_STARTUP=true
+
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=change-me
+ADMIN_TOKEN=change-me
+```
+
+Приложение загружает `.env` через `DotenvPropertyLoader` при старте (до инициализации Spring-контекста).
+
+## Webhook: локально через ngrok и прод через домен сервера
+Подход один и тот же: меняется только значение `TELEGRAM_WEBHOOK_URL`.
+
+### Локально (ngrok)
+1. Запусти приложение: `mvn -DskipTests package` и `java -jar target/timetable-bot-0.1.0-SNAPSHOT.jar`
+2. Подними туннель: `ngrok http 8080`
+3. Возьми HTTPS URL из ngrok и укажи в `.env`:
+
+```env
+TELEGRAM_BOT_ENABLED=true
+TELEGRAM_BOT_TOKEN=<BOTFATHER_TOKEN>
+TELEGRAM_WEBHOOK_SECRET=<RANDOM_SECRET>
+TELEGRAM_WEBHOOK_URL=https://<your-ngrok-domain>/telegram/webhook
+TELEGRAM_REGISTER_WEBHOOK_ON_STARTUP=true
+```
+
+### Прод/сервер
+На сервере используй тот же конфиг, но с доменом сервера:
+
+```env
+TELEGRAM_BOT_ENABLED=true
+TELEGRAM_BOT_TOKEN=<BOTFATHER_TOKEN>
+TELEGRAM_WEBHOOK_SECRET=<RANDOM_SECRET>
+TELEGRAM_WEBHOOK_URL=https://<your-server-domain>/telegram/webhook
+TELEGRAM_REGISTER_WEBHOOK_ON_STARTUP=true
+```
+
+Важно:
+- `TELEGRAM_WEBHOOK_URL` должен быть публичным HTTPS URL.
+- Endpoint webhook в приложении: `/telegram/webhook`.
+- При смене URL (ngrok -> сервер) просто меняешь `TELEGRAM_WEBHOOK_URL` и перезапускаешь приложение.
 
 ## Telegram настройки
 - `TELEGRAM_BOT_ENABLED` — включить отправку сообщений в Telegram API.

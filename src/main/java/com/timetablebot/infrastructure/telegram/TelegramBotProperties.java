@@ -1,13 +1,14 @@
 package com.timetablebot.infrastructure.telegram;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@ConfigurationProperties(prefix = "telegram.bot")
+@Component
 public record TelegramBotProperties(
-        String token,
-        boolean enabled,
-        String webhookSecret,
-        String webhookUrl,
-        boolean registerWebhookOnStartup
+        @Value("${telegram.bot.token:}") String token,
+        @Value("${telegram.bot.enabled:false}") boolean enabled,
+        @Value("${telegram.bot.webhook-secret:}") String webhookSecret,
+        @Value("${telegram.bot.webhook-url:}") String webhookUrl,
+        @Value("${telegram.bot.register-webhook-on-startup:false}") boolean registerWebhookOnStartup
 ) {
 }

@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,8 +19,11 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class HealthcheckController {
@@ -30,15 +34,21 @@ public class HealthcheckController {
     private final ObjectProvider<ConnectionFactory> rabbitConnectionFactoryProvider;
     private final ObjectProvider<TelegramBotProperties> telegramBotPropertiesProvider;
     private final ObjectProvider<TelegramBotClient> telegramBotClientProvider;
+    private final List<String> authors;
 
     public HealthcheckController(ObjectProvider<ReactiveMongoTemplate> mongoTemplateProvider,
                                  ObjectProvider<ConnectionFactory> rabbitConnectionFactoryProvider,
                                  ObjectProvider<TelegramBotProperties> telegramBotPropertiesProvider,
-                                 ObjectProvider<TelegramBotClient> telegramBotClientProvider) {
+                                 ObjectProvider<TelegramBotClient> telegramBotClientProvider,
+                                 @Value("${HEALTHCHECK_AUTHORS:unknown}") String authorsRaw) {
         this.mongoTemplateProvider = mongoTemplateProvider;
         this.rabbitConnectionFactoryProvider = rabbitConnectionFactoryProvider;
         this.telegramBotPropertiesProvider = telegramBotPropertiesProvider;
         this.telegramBotClientProvider = telegramBotClientProvider;
+        this.authors = Arrays.stream(authorsRaw.split(","))
+                .map(String::trim)
+                .filter(value -> !value.isEmpty())
+                .collect(Collectors.toList());
     }
 
 
@@ -62,6 +72,7 @@ public class HealthcheckController {
                     response.put("timestamp", Instant.now().toString());
                     response.put("request_id", currentRequestId(request));
                     response.put("dependencies", dependencies);
+                    response.put("authors", authors);
                     return response;
                 });
     }
