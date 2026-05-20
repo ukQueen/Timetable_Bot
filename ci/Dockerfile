@@ -1,6 +1,10 @@
-FROM maven:3.9.10-eclipse-temurin-25
+FROM eclipse-temurin:25-jdk
 
 WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends maven \
+    && rm -rf /var/lib/apt/lists/*
 
 # copy pom first for better layer caching
 COPY pom.xml ./

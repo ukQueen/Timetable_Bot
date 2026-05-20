@@ -2,13 +2,12 @@ package com.timetablebot.infrastructure.telegram;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
-public class TelegramWebhookRegistrar implements ApplicationRunner {
+public class TelegramWebhookRegistrar {
     private static final Logger log = LoggerFactory.getLogger(TelegramWebhookRegistrar.class);
 
     private final TelegramBotClient telegramBotClient;
@@ -19,8 +18,8 @@ public class TelegramWebhookRegistrar implements ApplicationRunner {
         this.properties = properties;
     }
 
-    @Override
-    public void run(ApplicationArguments args) {
+    @EventListener(org.springframework.context.event.ContextRefreshedEvent.class)
+    public void registerWebhookOnStartup() {
         if (!properties.enabled() || !properties.registerWebhookOnStartup()) {
             return;
         }

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.DefaultApplicationArguments;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -25,7 +24,7 @@ class TelegramWebhookRegistrarTest {
 
         when(telegramBotClient.registerWebhook(anyString(), anyString())).thenReturn(Mono.empty());
 
-        registrar.run(new DefaultApplicationArguments(new String[]{}));
+        registrar.registerWebhookOnStartup();
 
         verify(telegramBotClient).registerWebhook("https://example.com/telegram/webhook", "secret");
     }
@@ -35,7 +34,7 @@ class TelegramWebhookRegistrarTest {
         TelegramBotProperties props = new TelegramBotProperties("token", true, "secret", "", true);
         TelegramWebhookRegistrar registrar = new TelegramWebhookRegistrar(telegramBotClient, props);
 
-        registrar.run(new DefaultApplicationArguments(new String[]{}));
+        registrar.registerWebhookOnStartup();
 
         verify(telegramBotClient, never()).registerWebhook(anyString(), anyString());
     }
@@ -45,7 +44,7 @@ class TelegramWebhookRegistrarTest {
         TelegramBotProperties props = new TelegramBotProperties("token", false, "secret", "https://example.com/telegram/webhook", true);
         TelegramWebhookRegistrar registrar = new TelegramWebhookRegistrar(telegramBotClient, props);
 
-        registrar.run(new DefaultApplicationArguments(new String[]{}));
+        registrar.registerWebhookOnStartup();
 
         verify(telegramBotClient, never()).registerWebhook(anyString(), anyString());
     }
