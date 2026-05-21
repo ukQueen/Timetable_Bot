@@ -4,6 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +34,8 @@ public class NotificationQueueConfig {
     }
 
     @Bean
-    public Binding notificationsDlqBinding(Queue notificationsDeadLetterQueue,
-                                           DirectExchange notificationsDlx,
+    public Binding notificationsDlqBinding(@Qualifier("notificationsDeadLetterQueue") Queue notificationsDeadLetterQueue,
+                                           @Qualifier("notificationsDlx") DirectExchange notificationsDlx,
                                            @Value("${notifications.dlq.routing-key:notifications.dead}") String dlRoutingKey) {
         return BindingBuilder.bind(notificationsDeadLetterQueue)
                 .to(notificationsDlx)

@@ -1,5 +1,7 @@
 package com.timetablebot.infrastructure.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -12,6 +14,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class InfrastructureConfig {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return JsonMapper.builder()
+                .findAndAddModules()
+                .build();
+    }
 
     @Bean
     public WebClient.Builder webClientBuilder() {
