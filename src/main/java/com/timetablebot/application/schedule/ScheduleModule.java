@@ -30,6 +30,11 @@ public class ScheduleModule {
         this.externalTimetableClient = externalTimetableClient;
     }
 
+    public Flux<ScheduleEvent> allEvents(String userId) {
+                return repository.findAllByUserIdAndEndsAtAfterOrderByStartsAtAsc(userId, Instant.now())
+                .map(this::toDomain);
+    }
+
     public Flux<ScheduleEvent> eventsForToday(String userId, ZoneId zoneId) {
         LocalDate now = LocalDate.now(zoneId);
         return eventsByDateRange(userId, now, now.plusDays(1), zoneId);
@@ -64,6 +69,11 @@ public class ScheduleModule {
     public Mono<Integer> importFromExternalApi(String userId, String url) {
         return externalTimetableClient.download(url)
                 .flatMap(payload -> importEvents(userId, parseCsv(payload), "external_api"));
+    }
+
+    public Mono<Integer> importFromTelegramFile(String userId, String fileId) {
+        return externalTimetableClient.downloadTelegramFile(fileId)
+                .flatMap(payload -> importEvents(userId, parseCsv(payload), "csv_file"));
     }
 
     public Flux<ImportHistoryItem> importHistory(String userId) {
@@ -285,5 +295,5 @@ public class ScheduleModule {
 
     private record ImportedEvent(EventType type, String title, String place, Instant startsAt, Instant endsAt, String source) {
     }
-    
+
 }
