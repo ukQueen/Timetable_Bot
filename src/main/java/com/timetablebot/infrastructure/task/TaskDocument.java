@@ -20,8 +20,7 @@ public class TaskDocument {
     private TaskPriority priority;
     private TaskStatus status;
     private Instant deadline;
-    private Instant lastReminderSentAt;
-    private Instant createdAt;
+    private Instant lastReminderSentAt;          private boolean reminder24hSent = false;     private boolean reminder1hSent  = false;     private Instant createdAt;
     private Instant updatedAt;
 
     public String getId() { return id; }
@@ -40,6 +39,10 @@ public class TaskDocument {
     public void setDeadline(Instant deadline) { this.deadline = deadline; }
     public Instant getLastReminderSentAt() { return lastReminderSentAt; }
     public void setLastReminderSentAt(Instant lastReminderSentAt) { this.lastReminderSentAt = lastReminderSentAt; }
+    public boolean isReminder24hSent() { return reminder24hSent; }
+    public void setReminder24hSent(boolean reminder24hSent) { this.reminder24hSent = reminder24hSent; }
+    public boolean isReminder1hSent() { return reminder1hSent; }
+    public void setReminder1hSent(boolean reminder1hSent) { this.reminder1hSent = reminder1hSent; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
