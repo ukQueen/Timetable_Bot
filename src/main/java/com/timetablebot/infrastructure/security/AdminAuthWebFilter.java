@@ -26,7 +26,7 @@ public class AdminAuthWebFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getPath().value();
 
-        if (!path.startsWith(ADMIN_PREFIX) || path.equals(AUTH_PATH) || path.equals("/healthcheck")) {
+        if (!path.startsWith(ADMIN_PREFIX) || path.equals("/admin/auth") || path.equals("/healthcheck")) {
             return chain.filter(exchange);
         }
 
