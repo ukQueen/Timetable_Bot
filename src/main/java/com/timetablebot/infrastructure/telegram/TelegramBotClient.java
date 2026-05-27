@@ -20,7 +20,6 @@ public class TelegramBotClient {
         this.webClient = builder.baseUrl("https://api.telegram.org").build();
     }
 
-
     public Mono<Void> registerWebhook(String webhookUrl, String webhookSecret) {
         if (!properties.enabled() || properties.token() == null || properties.token().isBlank() || webhookUrl == null || webhookUrl.isBlank()) {
             return Mono.empty();
