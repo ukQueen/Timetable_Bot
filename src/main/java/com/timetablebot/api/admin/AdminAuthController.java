@@ -19,7 +19,7 @@ public class AdminAuthController {
         this.properties = properties;
     }
 
-    @PostMapping("/auth")
+    @PostMapping("/admin/auth")
     @ResponseStatus(HttpStatus.OK)
     public Mono<Map<String, String>> auth(@RequestBody Map<String, String> body) {
         String username = body.getOrDefault("username", "");
