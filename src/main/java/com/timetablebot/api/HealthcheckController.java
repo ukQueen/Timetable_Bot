@@ -51,7 +51,6 @@ public class HealthcheckController {
                 .collect(Collectors.toList());
     }
 
-
     @GetMapping(value = "/healthcheck", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<Map<String, Object>> healthcheck(ServerHttpRequest request) {
         return Mono.zip(mongoHealth(), rabbitHealth(), telegramHealth())
