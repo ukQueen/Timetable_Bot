@@ -109,8 +109,6 @@ class HealthcheckControllerUnitTest {
                 .verifyComplete();
     }
 
-
-
     private TelegramBotClient upTelegramClient() {
         TelegramBotClient telegramBotClient = mock(TelegramBotClient.class);
         when(telegramBotClient.healthProbe()).thenReturn(reactor.core.publisher.Mono.just("UP"));

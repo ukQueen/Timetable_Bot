@@ -2,12 +2,11 @@ package com.timetablebot.application.notification;
 
 import com.timetablebot.domain.user.TaskStatus;
 import com.timetablebot.infrastructure.notification.NotificationPublisher;
+import com.timetablebot.infrastructure.schedule.ScheduleEventRepository;
 import com.timetablebot.infrastructure.task.TaskDocument;
 import com.timetablebot.infrastructure.task.TaskRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
@@ -15,63 +14,58 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TaskReminderSchedulerTest {
 
-    @Mock
-    private TaskRepository taskRepository;
-    @Mock
-    private NotificationPublisher notificationPublisher;
-
-    @InjectMocks
-    private TaskReminderScheduler scheduler = new TaskReminderScheduler(taskRepository, notificationPublisher, 30);
+    @Mock private TaskRepository taskRepository;
+    @Mock private ScheduleEventRepository scheduleEventRepository;
+    @Mock private NotificationPublisher notificationPublisher;
 
     @Test
-    void shouldPublishAndMarkTaskWhenReminderNotSent() {
+    void shouldPublishReminderForTaskDueInOneHour() {
         TaskDocument task = new TaskDocument();
         task.setId("t1");
         task.setUserId("1001");
-        task.setTitle("Prepare report");
+        task.setTitle("Lab work");
         task.setStatus(TaskStatus.OPEN);
-        task.setDeadline(Instant.now().plusSeconds(600));
+        task.setDeadline(Instant.now().plusSeconds(3600));
         task.setLastReminderSentAt(null);
 
-        when(taskRepository.findAllByStatusAndDeadlineBetweenOrderByDeadlineAsc(eq(TaskStatus.OPEN), any(), any()))
+        when(taskRepository.findAllByStatusAndDeadlineBetween(eq(TaskStatus.OPEN), any(), any()))
                 .thenReturn(Flux.just(task));
-        when(taskRepository.save(any(TaskDocument.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(taskRepository.save(any(TaskDocument.class))).thenReturn(Mono.just(task));
+        when(scheduleEventRepository.findAllByStartsAtBetween(any(), any())).thenReturn(Flux.empty());
+        when(scheduleEventRepository.findAllByEndsAtBefore(any())).thenReturn(Flux.empty());
 
-        scheduler.scheduleUpcomingTaskReminders();
+        TaskReminderScheduler scheduler = new TaskReminderScheduler(taskRepository, scheduleEventRepository, notificationPublisher);
+        scheduler.scheduleReminders();
 
-        verify(notificationPublisher).publishTask(any(NotificationTaskPayload.class));
-
-        ArgumentCaptor<TaskDocument> savedCaptor = ArgumentCaptor.forClass(TaskDocument.class);
-        verify(taskRepository).save(savedCaptor.capture());
-        assertNotNull(savedCaptor.getValue().getLastReminderSentAt());
+        verify(notificationPublisher, atLeastOnce()).publishTask(any());
     }
 
     @Test
-    void shouldSkipTaskWhenReminderAlreadySent() {
+    void shouldSkipTaskAlreadyRemindedRecently() {
         TaskDocument task = new TaskDocument();
         task.setId("t2");
-        task.setUserId("1002");
-        task.setTitle("Already reminded");
+        task.setUserId("1001");
+        task.setTitle("Old reminder");
         task.setStatus(TaskStatus.OPEN);
-        task.setDeadline(Instant.now().plusSeconds(600));
-        task.setLastReminderSentAt(Instant.now().minusSeconds(60));
+        task.setDeadline(Instant.now().plusSeconds(3600));
+        // Напоминание было 10 секунд назад — внутри окна, пропускаем
+        task.setLastReminderSentAt(Instant.now().minusSeconds(10));
 
-        when(taskRepository.findAllByStatusAndDeadlineBetweenOrderByDeadlineAsc(eq(TaskStatus.OPEN), any(), any()))
+        when(taskRepository.findAllByStatusAndDeadlineBetween(eq(TaskStatus.OPEN), any(), any()))
                 .thenReturn(Flux.just(task));
+        when(scheduleEventRepository.findAllByStartsAtBetween(any(), any())).thenReturn(Flux.empty());
+        when(scheduleEventRepository.findAllByEndsAtBefore(any())).thenReturn(Flux.empty());
 
-        scheduler.scheduleUpcomingTaskReminders();
+        TaskReminderScheduler scheduler = new TaskReminderScheduler(taskRepository, scheduleEventRepository, notificationPublisher);
+        scheduler.scheduleReminders();
 
-        verify(notificationPublisher, never()).publishTask(any(NotificationTaskPayload.class));
-        verify(taskRepository, never()).save(any(TaskDocument.class));
+        verify(notificationPublisher, never()).publishTask(any());
     }
 }

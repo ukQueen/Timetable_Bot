@@ -18,7 +18,7 @@ class AdminAuthControllerTest {
     @Test
     void shouldReturnTokenForValidCredentials() {
         webTestClient.post()
-                .uri("/auth")
+                .uri("/admin/auth")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("username", "admin", "password", "admin123"))
                 .exchange()
@@ -31,7 +31,7 @@ class AdminAuthControllerTest {
     @Test
     void shouldRejectInvalidCredentials() {
         webTestClient.post()
-                .uri("/auth")
+                .uri("/admin/auth")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("username", "admin", "password", "wrong"))
                 .exchange()

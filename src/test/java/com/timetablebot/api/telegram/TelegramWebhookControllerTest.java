@@ -88,7 +88,7 @@ class TelegramWebhookControllerTest {
         task.setTitle("HW");
         task.setDeadline(Instant.parse("2026-05-13T12:00:00Z"));
         given(taskRepository.save(any(TaskDocument.class))).willReturn(Mono.just(task));
-        given(taskRepository.findAllByUserIdAndDeadlineBetweenOrderByDeadlineAsc(any(), any(), any())).willReturn(Flux.just(task));
+        given(taskRepository.findAllByUserIdAndStatusAndDeadlineBetweenOrderByDeadlineAsc(any(), any(), any(), any())).willReturn(Flux.just(task));
         given(taskRepository.findByIdAndUserId(eq("t1"), any())).willReturn(Mono.just(task));
         given(taskRepository.findAllByUserIdAndStatusAndDeadlineBeforeOrderByDeadlineAsc(any(), any(), any())).willReturn(Flux.just(task));
         given(taskRepository.deleteByIdAndUserId(eq("t1"), any())).willReturn(Mono.empty());
@@ -102,7 +102,6 @@ class TelegramWebhookControllerTest {
                 .exchange().expectStatus().isOk().expectBody()
                 .jsonPath("$.status").isEqualTo("ok");
     }
-
 
     @Test
     void shouldImportTimetableFromCsv() {
