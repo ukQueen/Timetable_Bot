@@ -19,6 +19,8 @@ public class ScheduleEventDocument {
     private String source;
     private Instant startsAt;
     private Instant endsAt;
+    private boolean reminder24hSent = false;
+    private boolean reminder1hSent  = false;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -36,4 +38,8 @@ public class ScheduleEventDocument {
     public void setStartsAt(Instant startsAt) { this.startsAt = startsAt; }
     public Instant getEndsAt() { return endsAt; }
     public void setEndsAt(Instant endsAt) { this.endsAt = endsAt; }
+    public boolean isReminder24hSent() { return reminder24hSent; }
+    public void setReminder24hSent(boolean reminder24hSent) { this.reminder24hSent = reminder24hSent; }
+    public boolean isReminder1hSent() { return reminder1hSent; }
+    public void setReminder1hSent(boolean reminder1hSent) { this.reminder1hSent = reminder1hSent; }
 }

@@ -113,6 +113,9 @@ public class TaskReminderScheduler {
         Instant windowEnd   = now.plusSeconds(leadSec + WINDOW_SEC);
 
         scheduleEventRepository.findAllByStartsAtBetween(windowStart, windowEnd)
+                .filter(event -> leadSec == DAY_SEC
+                        ? !event.isReminder24hSent()
+                        : !event.isReminder1hSent())
                 .flatMap(event -> {
                     String typeLabel = event.getType() != null
                             ? (event.getType().name().equals("EXAM") ? "экзамен" : "занятие")
@@ -124,7 +127,12 @@ public class TaskReminderScheduler {
                     log.info("Sending event reminder for '{}' to user {}", event.getTitle(), event.getUserId());
                     notificationPublisher.publishTask(new NotificationTaskPayload(
                             event.getUserId(), event.getId(), event.getTitle(), event.getStartsAt(), msg));
-                    return Flux.just(event);
+                    if (leadSec == DAY_SEC) {
+                        event.setReminder24hSent(true);
+                    } else {
+                        event.setReminder1hSent(true);
+                    }
+                    return scheduleEventRepository.save(event);
                 })
                 .doOnError(ex -> log.warn("Failed to send event reminders", ex))
                 .onErrorResume(ex -> Flux.empty())
