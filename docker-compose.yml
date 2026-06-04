@@ -32,9 +32,7 @@ services:
       start_period: 20s
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: infernotawer/timetable-bot:latest
     container_name: timetable-app
     restart: unless-stopped
     depends_on:
@@ -44,6 +42,8 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SERVER_PORT: 8080
@@ -61,3 +61,5 @@ services:
 
 volumes:
   mongodb_data:
+    external: true
+    name: project_mongodb_data
