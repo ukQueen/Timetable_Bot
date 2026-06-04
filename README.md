@@ -2,7 +2,18 @@
 Lessons and Exams Timetable Bot
 ### DockerHub Link
 - Docker Hub Link: https://hub.docker.com/r/infernotawer/timetable-bot
-
+## Запуск с докерхаба
+- Создать директорию у себя на компьютере
+- Добавить в нее файл .env со всеми токенами и ссылкой на, например, ngrok.
+- Добавить в нее файл docker-compose.yml
+- Перейти в созданную директорию и запустить бота командой
+```bash
+docker compose up -d
+```
+- Проверить запуск с помощью healthcheck
+```bash
+curl http://localhost:8080/healthcheck
+```
 ## Локальный запуск
 ### Требования
 - Java 25+
